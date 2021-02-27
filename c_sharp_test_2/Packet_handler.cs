@@ -9,11 +9,11 @@ namespace c_sharp_test_2
 {
     class Packet_handler
     {
-        private PacketDevice selectedDevice_send;
+        private PacketCommunicator pack_comm;
         private string name;
-        public void get_device_send(PacketDevice p, string name)
+        public void get_device_send(PacketCommunicator pack_comm, string name)
         {
-            selectedDevice_send = p;
+            this.pack_comm = pack_comm;
             this.name = name;
         }
         public void run_handler(Packet packet)
@@ -26,13 +26,10 @@ namespace c_sharp_test_2
             //UdpDatagram udp = ip.Udp;
 
 
-            using (PacketCommunicator communicator_send = selectedDevice_send.Open(100, // name of the device
-                                                                         PacketDeviceOpenAttributes.Promiscuous | PacketDeviceOpenAttributes.NoCaptureLocal, // promiscuous mode
-                                                                         1000)) // read timeout
-            {
-                communicator_send.SendPacket(packet);
-                Console.WriteLine("packet send");
-            }
+
+            pack_comm.SendPacket(packet);
+            Console.WriteLine("packet send");
+            
 
             /*
             if (packet != null)

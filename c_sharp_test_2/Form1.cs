@@ -38,10 +38,43 @@ namespace c_sharp_test_2
         {
 
 
-            //int test = Packet_counter.Expired;
-            //textBox1.Text = test.ToString();
+            foreach (TextBox tb in groupBox1.Controls.OfType<TextBox>())
+            {
 
-            textBox1.Text = "0";
+                //tb.Text = stats[tb.TabIndex-1].ToString();
+                if (tb.TabIndex <= 14)
+                {
+                    tb.Text = "0";
+                    //break;
+                }
+
+                
+            }
+            foreach (TextBox tb in groupBox2.Controls.OfType<TextBox>())
+            {
+                if (tb.TabIndex > 14)//asi zbytocne
+                {
+                    tb.Text = "0";
+
+                }
+
+
+
+
+            }
+
+
+
+            int[] num_pck1 = Packet_counter.load_values;
+            int[] num_pck2 = Packet_counter.load_values_2;
+            for (int i = 0; i < 14; i++)//tu povodne bolo len pre jeden delegate
+            {
+                num_pck1[i] = 0;
+                num_pck2[i] = 0;
+            }
+            
+            
+
         }
         /*
         public void AddListItemMethod()
@@ -69,9 +102,9 @@ namespace c_sharp_test_2
             int i = 0;//set this textbox
             foreach (TextBox tb in groupBox2.Controls.OfType<TextBox>())
             {
-                if (tb.TabIndex > 10)
+                if (tb.TabIndex > 14)//asi zbytocne
                 {
-                    tb.Text = stats[tb.TabIndex - 11].ToString();
+                    tb.Text = stats[tb.TabIndex - 15].ToString();
                     i++;
                 }
                 
@@ -94,7 +127,7 @@ namespace c_sharp_test_2
             {
                 
                 //tb.Text = stats[tb.TabIndex-1].ToString();
-                if (tb.TabIndex <= 10)
+                if (tb.TabIndex <= 14)
                 {
                     tb.Text = stats[tb.TabIndex - 1].ToString();
                     //break;
@@ -111,7 +144,8 @@ namespace c_sharp_test_2
         }
         private void Form1_Load_1(object sender, EventArgs e)
         {
-            textBox1.Text = "0";
+            
+
             /*
             while (true)
             {
@@ -139,6 +173,11 @@ namespace c_sharp_test_2
         }
 
         private void label3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox5_TextChanged(object sender, EventArgs e)
         {
 
         }

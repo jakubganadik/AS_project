@@ -61,10 +61,15 @@ namespace c_sharp_test_2
             string name_1, name_2;
             name_1 = "one";
             name_2 = "two";
-            h_1.get_device_send(selectedDevice_2, name_1);
-            h_2.get_device_send(selectedDevice_1, name_2);
-            lis_1.list_get(selectedDevice_1, name_1, h_1, myForm);
-            lis_2.list_get(selectedDevice_2, name_2, h_2, myForm);
+
+            PacketCommunicator communicator_lis_1 = selectedDevice_1.Open(65536, PacketDeviceOpenAttributes.Promiscuous | PacketDeviceOpenAttributes.NoCaptureLocal, 1000); // promiscuous mode
+            PacketCommunicator communicator_lis_2 = selectedDevice_2.Open(65536, PacketDeviceOpenAttributes.Promiscuous | PacketDeviceOpenAttributes.NoCaptureLocal, 1000);
+            // new part
+
+            h_1.get_device_send(communicator_lis_2, name_1);
+            h_2.get_device_send(communicator_lis_1, name_2);
+            lis_1.list_get(communicator_lis_1, name_1, h_1, myForm);
+            lis_2.list_get(communicator_lis_2, name_2, h_2, myForm);
             ThreadStart childref_1 = new ThreadStart(lis_1.recv);
             ThreadStart childref_2 = new ThreadStart(lis_2.recv);
             Thread childThread_1 = new Thread(childref_1);

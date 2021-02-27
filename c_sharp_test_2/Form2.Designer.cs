@@ -68,7 +68,7 @@ namespace c_sharp_test_2
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 3;
-            this.button1.Text = "button1";
+            this.button1.Text = "start";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
@@ -77,9 +77,8 @@ namespace c_sharp_test_2
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(357, 356);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(38, 15);
+            this.label3.Size = new System.Drawing.Size(0, 15);
             this.label3.TabIndex = 4;
-            this.label3.Text = "label3";
             // 
             // Form2
             // 
