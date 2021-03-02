@@ -15,11 +15,7 @@ namespace c_sharp_test_2
         public delegate void AddListItem();
         public AddListItem myDelegate;
         public AddListItem myDelegate_2;
-        /*
-        public delegate void update_text(string str);
-        ThreadStart threadstart;
-        Thread my_thread;
-        */
+        
         public Form1()
         {
             InitializeComponent();
