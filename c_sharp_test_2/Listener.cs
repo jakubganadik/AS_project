@@ -15,6 +15,11 @@ namespace c_sharp_test_2
         private string name;
         Packet_handler h;
         private Form1 myform;
+        private string mac_dest;
+        private List<Cam_table> tbl;
+        private bool has_src;
+        private bool has_dst;
+        
         public void list_get(PacketCommunicator pack_comm, string name, Packet_handler h, Form1 myform)
         {
 
@@ -26,6 +31,8 @@ namespace c_sharp_test_2
         public void recv()
         {
 
+            List<Cam_table> cam_vals = new List<Cam_table>();
+            //Packet_counter.cam_values = cam_vals;
             //ph.get_device_send(allDevices[deviceIndex_2 - 1]);
             int[] num_packets = new int[14];
             
@@ -76,6 +83,45 @@ namespace c_sharp_test_2
                         continue;
                     case PacketCommunicatorReceiveResult.Ok:
                         Console.WriteLine(packet.Timestamp.ToString("yyyy-MM-dd hh:mm:ss.fff") + " length:" + packet.Length + "thread name" + name + " type " + packet.Ethernet.EtherType);
+                        //new_mac = 0;
+                        //-------------------------------------------------------------------------------------------
+                        if (packet.Ethernet.Source.ToString()[1] == '0' || packet.Ethernet.Source.ToString()[1] == '4' || packet.Ethernet.Source.ToString()[1] == '8' || packet.Ethernet.Source.ToString()[1] == 'C') //kontrola zariadenia
+                        {
+                            has_dst = false;
+                            has_src = false;
+                            tbl =Packet_counter.cam_values;
+                            foreach (Cam_table t in tbl)
+                            {
+                                if (t.get_mac() == packet.Ethernet.Source.ToString())
+                                {
+                                    t.set_timer(0);
+                                    has_src = true;
+                                }
+                                if (t.get_mac() == packet.Ethernet.Destination.ToString())
+                                {
+                                    mac_dest = t.get_mac();
+                                    has_dst = true;
+                                }
+                                
+                            }
+                            if (has_src == false)
+                            {
+                                Cam_table c = new Cam_table();
+                                c.set_cam(packet.Ethernet.Destination.ToString(),name,0);//solve timer counting--------------------------------------------
+                                tbl.Add(c);
+                                Packet_counter.cam_values =tbl;//zaznam v cam tab
+                                
+                            }
+                            if (has_dst == false)
+                            {
+
+                                //send everywhere
+                            }
+                            
+                            
+                        }
+                        //iny thread a funkcia
+                        //---------------------------------------------------------------------------------------------
                         if (packet.DataLink.Kind.ToString() == "Ethernet") // toto spojit
                         {
                             num_packets[6]++;
@@ -120,7 +166,7 @@ namespace c_sharp_test_2
                             }
 
                         }
-                        
+                        //new threads here
                         if (name == "one")
                         {
                             Packet_counter.load_values = num_packets;//tuto test
