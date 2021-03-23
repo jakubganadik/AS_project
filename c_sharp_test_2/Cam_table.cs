@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-
+using System.Diagnostics;
 namespace c_sharp_test_2
 {
     public class Cam_table
@@ -9,15 +9,21 @@ namespace c_sharp_test_2
         private string MAC;
         private string port;
         private int timer;
-        public void set_cam(string m, string p, int t)
+        private Stopwatch stopwatch;
+        public void set_cam(string m, string p)
         {
             this.MAC = m;
             this.port = p;
-            this.timer = t;
+            Stopwatch stopwatch = new Stopwatch();
+            this.stopwatch = stopwatch;
+            // Begin timing.
+            this.stopwatch.Start();
         }
-        public void set_timer(int t)
+        public void set_timer()
         {
-            this.timer = t;
+            stopwatch.Restart();
+            //this.stopwatch.Stop();
+            //this.stopwatch.Start();
         }
         public void set_port(string p)
         {
@@ -25,15 +31,39 @@ namespace c_sharp_test_2
         }
         public string get_mac()
         {
-            return this.MAC;
+            if (this.MAC == null)
+            {
+                return "";
+            }
+            else
+            {
+                return this.MAC;
+            }
+            
         }
         public string get_port()
         {
-            return this.port;
+            if (this.port == null)
+            {
+                return "";
+            }
+            else
+            {
+                return this.port;
+            }
+            
         }
-        public int get_timer()
+        public string get_timer()
         {
-            return this.timer;
+            if (stopwatch.Elapsed.ToString() == null)
+            {
+                return "";
+            }
+            else
+            {
+                return this.stopwatch.Elapsed.ToString();
+            }
+            
         }
         
 

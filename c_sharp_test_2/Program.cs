@@ -49,7 +49,13 @@ namespace c_sharp_test_2
 
 
             // Take the selected adapter
+            Cam_table_print c = new Cam_table_print();
+            c.set(myForm);
+            ThreadStart childref_cam = new ThreadStart(c.run_cam_print);//nie pocas inicializacie
 
+            Thread camthr = new Thread(childref_cam);
+
+            camthr.Start();
             //---------------------------------------------------------------------------------------------------starting new threads
             PacketDevice selectedDevice_1 = allDevices[deviceIndex_1 - 1];
 
@@ -66,10 +72,10 @@ namespace c_sharp_test_2
             PacketCommunicator communicator_lis_2 = selectedDevice_2.Open(65536, PacketDeviceOpenAttributes.Promiscuous | PacketDeviceOpenAttributes.NoCaptureLocal, 1000);
             // new part
 
-            h_1.get_device_send(communicator_lis_2, name_1);
+            h_1.get_device_send(communicator_lis_2, name_1);//IN port has a correct name and OUT has different
             h_2.get_device_send(communicator_lis_1, name_2);
-            lis_1.list_get(communicator_lis_1, name_1, h_1, myForm);
-            lis_2.list_get(communicator_lis_2, name_2, h_2, myForm);
+            lis_1.list_get(communicator_lis_1, name_1, h_1, myForm,name_2,h_2);
+            lis_2.list_get(communicator_lis_2, name_2, h_2, myForm,name_2,h_2);
             ThreadStart childref_1 = new ThreadStart(lis_1.recv);
             ThreadStart childref_2 = new ThreadStart(lis_2.recv);
             Thread childThread_1 = new Thread(childref_1);

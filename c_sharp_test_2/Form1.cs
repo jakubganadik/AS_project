@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Threading;
+using System.Collections.Concurrent;
 namespace c_sharp_test_2
 {
     public partial class Form1 : Form
@@ -15,13 +16,29 @@ namespace c_sharp_test_2
         public delegate void AddListItem();
         public AddListItem myDelegate;
         public AddListItem myDelegate_2;
-        
+        public AddListItem myDelegate_3;
+        private int i;
+        private int j;
+        private int help_print;
+        private bool one_row;
+        private int cur_i;
+        private Cam_table[] up_cams;
+        private int[] removed_cams;
+        private int cur_time;
+        private int max_time;
+        private bool remove_cam_val;
+        private int size;
+        static readonly object _object = new object();
+        private bool cleared_table;
         public Form1()
         {
             InitializeComponent();
 
             myDelegate = new AddListItem(update_values);
             myDelegate_2 = new AddListItem(update_values_2);
+            myDelegate_3 = new AddListItem(update_cam);
+            max_time = 10;
+            cleared_table = false;
 
         }
         
@@ -92,6 +109,209 @@ namespace c_sharp_test_2
             return children.SelectMany(c => GetChildControls<TControl>(c)).Concat(children);
         }
         */
+        /*
+        public void run_thread_cam()
+        {
+            ThreadStart childref_1 = new ThreadStart(this.update_cam);//nie pocas inicializacie
+
+            Thread camthr = new Thread(childref_1);
+
+            camthr.Start();
+        }
+        */
+        private void clear_cam()
+        {
+            j = 0;
+            size = 0;
+            BlockingCollection<Cam_table> a = Packet_counter.cam_values;
+            int[] removed_cams = new int[4];
+            Cam_table[] up_cams = new Cam_table[4];
+            BlockingCollection<Cam_table> b = new BlockingCollection<Cam_table>();//prerobit
+            foreach (Cam_table c in a)
+            {
+                
+                size++;
+
+            }
+            
+            j = 0;
+            foreach (Cam_table item in a.GetConsumingEnumerable())
+            {
+                if (size == j + 1)
+                {
+                    break;
+                }
+                j++;
+            }
+            a = b;
+            Packet_counter.cam_values = a;
+            foreach (TextBox tb in groupBox3.Controls.OfType<TextBox>())
+            {
+                tb.Text = "";
+
+            }
+
+
+
+        }
+        public void update_cam()//after the first cam table update run a delegate with a thread in it
+        {
+
+
+            i = 0;
+            help_print = 0;
+            BlockingCollection<Cam_table> a = Packet_counter.cam_values;//wont work if its empty
+                                                                        //a.CopyTo();
+
+
+            //different approach, solve the controls
+            one_row = false;
+            i = 1;
+            cur_i = 0;
+            remove_cam_val = false;
+            
+            lock (_object)
+            {
+                if (cleared_table == true)
+                {
+                    clear_cam();
+                    cleared_table = false;
+                }
+                if (a != null)
+                {   //odpocitavat podla poctu tabuliek
+                    foreach (Cam_table c in a)//upravit tento bullshit a pridat lock na cele toto
+                    {
+                        foreach (TextBox tb in groupBox3.Controls.OfType<TextBox>())
+                        {
+                            if (tb.TabIndex < 3 * i && tb.TabIndex >= 3 * i - 3)
+                            {
+
+                                if (tb.TabIndex % 3 == 0)
+                                {
+                                    if (c != null)
+                                    {
+                                        tb.Text = c.get_mac();
+                                    }
+                                    else
+                                    {
+
+                                        break;
+                                    }
+
+                                }
+                                else if (tb.TabIndex % 3 == 1)
+                                {
+                                    if (c != null)
+                                    {
+                                        tb.Text = c.get_port();
+
+                                    }
+                                    else
+                                    {
+
+                                        break;
+                                    }
+
+                                }
+                                else if (tb.TabIndex % 3 == 2)
+                                {
+                                    if (c != null)
+                                    {
+                                        tb.Text = c.get_timer();
+
+                                        cur_time = Int32.Parse(c.get_timer().Substring(6, 2));
+
+                                        if (cur_time > max_time)
+                                        {
+                                            remove_cam_val = true;
+                                        }
+                                    }
+                                    else
+                                    {
+
+                                        break;
+                                    }
+
+
+
+
+                                }
+
+
+                            }
+
+
+
+
+                        }
+                        i++;
+                    }
+
+                    i = 0;
+                    if (remove_cam_val == true)
+                    {
+                        j = 0;
+                        size = 0;
+                        int[] removed_cams = new int[4];
+                        Cam_table[] up_cams = new Cam_table[4];
+                        BlockingCollection<Cam_table> b = new BlockingCollection<Cam_table>();//prerobit
+                        foreach (Cam_table c in a)
+                        {
+                            cur_time = Int32.Parse(c.get_timer().Substring(6, 2));
+                            if (cur_time <= max_time)
+                            {
+                                up_cams[i] = c;
+                                i++;
+                            }
+                            else
+                            {
+                                removed_cams[j] = j + 1;
+                                j++;
+                            }
+                            size++;
+
+                        }
+                        foreach (Cam_table t in up_cams)
+                        {
+                            if (t != null)
+                            {
+                                b.Add(t);
+                            }
+
+                        }
+                        j = 0;
+                        foreach (Cam_table item in a.GetConsumingEnumerable())
+                        {
+                            if (size == j + 1)
+                            {
+                                break;
+                            }
+                            j++;
+                        }
+                        a = b;
+                        Packet_counter.cam_values = a;
+                         foreach (int rem in removed_cams)
+                        {
+                            foreach (TextBox tb in groupBox3.Controls.OfType<TextBox>())
+                            {
+                                if (tb.TabIndex < 3 * rem && tb.TabIndex >= 3 * rem - 3)
+                                {
+                                    tb.Text = "";
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+            
+        }
+            
+
+
+
+
+        
         public void update_values_2()
         {//prerobit
             int[] stats = Packet_counter.load_values_2;
@@ -176,6 +396,28 @@ namespace c_sharp_test_2
         private void textBox5_TextChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void textBox43_TextChanged(object sender, EventArgs e)
+        {
+            
+
+        }
+
+        private void textBox29_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button3_Click(object sender, EventArgs e)//kontrola ci pouzivatel nezada nieco zle
+        {
+            
+            max_time = Int32.Parse(textBox29.Text);
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            cleared_table = true;
         }
     }
 }

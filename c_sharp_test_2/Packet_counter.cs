@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Text;
 using System;
 using System.Threading;
+using System.Collections.Concurrent;
 namespace c_sharp_test_2
 {
     public class Packet_counter
     {
         private static int[] statistics;
         private static int[] statistics_2;
-        private static List<Cam_table> vals;
+        private static BlockingCollection<Cam_table> vals;
         private static bool val1;
         private static AutoResetEvent event_1;
         
@@ -40,7 +41,8 @@ namespace c_sharp_test_2
             */
         }
         public static int[] load_values_2 { get { return statistics_2; } set { statistics_2 = value; } }
-        public static List<Cam_table> cam_values{ get { return vals; } set { vals = value; } }
+        
+        public static BlockingCollection<Cam_table> cam_values{ get { return vals; } set { vals = value; } }
         //public static int tcp_c { get{ return test} set { } } //dostanem  jednotlive hodnoty
         //public static int udp_c { get { return test} set { } } 
         // public static int tcp_c { get { return test} set { } } 

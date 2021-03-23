@@ -7,35 +7,45 @@ using PcapDotNet.Packets.Arp;
 using PcapDotNet.Packets.Transport;
 using System;
 using System.Threading;
+using System.Collections.Concurrent;
 namespace c_sharp_test_2
 {
     class Listener
     {
         private PacketCommunicator pack_comm;
         private string name;
+        private string name_loop;
         Packet_handler h;
+        Packet_handler h_loop;
         private Form1 myform;
         private string mac_dest;
-        private List<Cam_table> tbl;
+        private BlockingCollection<Cam_table> tbl;
+        
         private bool has_src;
         private bool has_dst;
-        
-        public void list_get(PacketCommunicator pack_comm, string name, Packet_handler h, Form1 myform)
+        private bool not_a_pc;
+        private string port_name;
+        public void list_get(PacketCommunicator pack_comm, string name, Packet_handler h, Form1 myform,string n_l,Packet_handler h_l)
         {
 
             this.pack_comm = pack_comm;
             this.name = name;
             this.h = h;
             this.myform = myform;
+            this.name_loop = n_l;
+            this.h_loop = h_l;
         }
         public void recv()
         {
 
-            List<Cam_table> cam_vals = new List<Cam_table>();
+            BlockingCollection<Cam_table> cam_vals = new BlockingCollection<Cam_table>();
+            BlockingCollection<Packet> packet_buff = new BlockingCollection<Packet>();
+            Packet_counter.cam_values = cam_vals;
+            Table_update t_up = new Table_update(); 
             //Packet_counter.cam_values = cam_vals;
             //ph.get_device_send(allDevices[deviceIndex_2 - 1]);
             int[] num_packets = new int[14];
-            
+            myform.Invoke(myform.myDelegate_3);//--------------------------------------------new delegate
             Thread.Sleep(10);
 
             for (int i = 0; i < 14; i++)//tu povodne bolo len pre jeden delegate
@@ -71,7 +81,12 @@ namespace c_sharp_test_2
             //zisti ci sa using opakuje
 
             //nedari sa zachytit premavku, otestovat, ci je spravny adapter cez gns a wireshark
-            
+            t_up.set_table(name, myform, packet_buff);
+            ThreadStart send = new ThreadStart(t_up.update);
+
+            Thread childThread_3 = new Thread(send);
+            childThread_3.Start();
+
             Packet packet;
             do
             {
@@ -84,101 +99,91 @@ namespace c_sharp_test_2
                     case PacketCommunicatorReceiveResult.Ok:
                         Console.WriteLine(packet.Timestamp.ToString("yyyy-MM-dd hh:mm:ss.fff") + " length:" + packet.Length + "thread name" + name + " type " + packet.Ethernet.EtherType);
                         //new_mac = 0;
+                        //mozno samost
                         //-------------------------------------------------------------------------------------------
+                        mac_dest = "";
+                        not_a_pc = true;
                         if (packet.Ethernet.Source.ToString()[1] == '0' || packet.Ethernet.Source.ToString()[1] == '4' || packet.Ethernet.Source.ToString()[1] == '8' || packet.Ethernet.Source.ToString()[1] == 'C') //kontrola zariadenia
                         {
-                            has_dst = false;
+                            not_a_pc = false;
                             has_src = false;
+                            
                             tbl =Packet_counter.cam_values;
-                            foreach (Cam_table t in tbl)
-                            {
-                                if (t.get_mac() == packet.Ethernet.Source.ToString())
-                                {
-                                    t.set_timer(0);
-                                    has_src = true;
-                                }
-                                if (t.get_mac() == packet.Ethernet.Destination.ToString())
-                                {
-                                    mac_dest = t.get_mac();
-                                    has_dst = true;
-                                }
-                                
-                            }
-                            if (has_src == false)
+                            //if empty
+                            if (tbl == null)
                             {
                                 Cam_table c = new Cam_table();
-                                c.set_cam(packet.Ethernet.Destination.ToString(),name,0);//solve timer counting--------------------------------------------
-                                tbl.Add(c);
-                                Packet_counter.cam_values =tbl;//zaznam v cam tab
                                 
-                            }
-                            if (has_dst == false)
-                            {
+                                c.set_cam(packet.Ethernet.Source.ToString(), name);
+                                
+                                
+                                tbl.Add(c);
+                                Packet_counter.cam_values = tbl;//zaznam v cam tab
 
-                                //send everywhere
+                            }
+                            else
+                            {
+                                foreach (Cam_table t in tbl)//osetrit null aj tu
+                                {
+                                    if (t != null)
+                                    {
+                                        if (t.get_mac() == packet.Ethernet.Source.ToString())
+                                        {
+                                            t.set_timer();
+                                            t.set_port(name);
+                                            has_src = true;
+                                        }
+                                        if (t.get_mac() == packet.Ethernet.Destination.ToString())
+                                        {
+                                            mac_dest = t.get_mac();
+                                            port_name = t.get_port();
+                                        }
+                                    }
+                                    
+
+                                }
+                                if (has_src == false)
+                                {
+                                    Cam_table c = new Cam_table();
+                                    
+                                    c.set_cam(packet.Ethernet.Source.ToString(), name);
+                                   
+                                    
+                                    tbl.Add(c);
+                                    Packet_counter.cam_values = tbl;//zaznam v cam tab
+
+                                }
                             }
                             
+                            //send
                             
+
+
                         }
                         //iny thread a funkcia
                         //---------------------------------------------------------------------------------------------
-                        if (packet.DataLink.Kind.ToString() == "Ethernet") // toto spojit
+                        
+                        
+
+                        //determine where to send
+                        packet_buff.Add(packet);//new packet added
+                        if (mac_dest != "")//dest already in the cam tab
                         {
-                            num_packets[6]++;
-                            num_packets[13]++;
-                            if (packet.Ethernet.EtherType.ToString() == "IpV4")
+                            if (name == port_name)//we are sending back on this port
                             {
-                                num_packets[5]++;
-                                num_packets[12]++;
-                                Console.WriteLine(packet.Ethernet.IpV4.Protocol);
-                                if (packet.Ethernet.IpV4.Protocol.ToString() == "Tcp")
-                                {
-                                    if (packet.Ethernet.IpV4.Tcp.SourcePort == 80 || packet.Ethernet.IpV4.Tcp.DestinationPort == 80)
-                                    {
-                                        num_packets[4]++;
-                                        num_packets[11]++;
-                                    }
-                                    else
-                                    {
-                                        num_packets[0]++;
-                                        num_packets[7]++;
-                                    }
-
-
-
-                                }
-                                else if (packet.Ethernet.IpV4.Protocol.ToString() == "Udp")
-                                {
-                                    num_packets[1]++;
-                                    num_packets[8]++;
-                                }
-                                else if (packet.Ethernet.IpV4.Protocol.ToString() == "InternetControlMessageProtocol")
-                                {
-                                    num_packets[2]++;
-                                    num_packets[9]++;
-                                }
-
+                                h_loop.run_handler(packet);
                             }
-                            else if (packet.Ethernet.EtherType.ToString() == "Arp")
+                            else
                             {
-                                num_packets[3]++;
-                                num_packets[10]++;
+                                h.run_handler(packet);
+                                
                             }
-
                         }
-                        //new threads here
-                        if (name == "one")
+                        else//broadcast everywhere except current port
                         {
-                            Packet_counter.load_values = num_packets;//tuto test
-                            myform.Invoke(myform.myDelegate);
                             h.run_handler(packet);
                         }
-                        else if (name == "two")
-                        {
-                            Packet_counter.load_values_2 = num_packets;//tuto test
-                            myform.Invoke(myform.myDelegate_2);
-                            h.run_handler(packet);
-                        }
+                        
 
 
 
