@@ -39,7 +39,7 @@ namespace c_sharp_test_2
         {
 
             BlockingCollection<Cam_table> cam_vals = new BlockingCollection<Cam_table>();
-            BlockingCollection<Packet> packet_buff = new BlockingCollection<Packet>();
+            BlockingCollection<Captured_packet> packet_buff = new BlockingCollection<Captured_packet>();
             Packet_counter.cam_values = cam_vals;
             Table_update t_up = new Table_update(); 
             //Packet_counter.cam_values = cam_vals;
@@ -163,31 +163,35 @@ namespace c_sharp_test_2
                         }
                         //iny thread a funkcia
                         //---------------------------------------------------------------------------------------------
-                        
-                        
+
+
 
                         //determine where to send
-                        packet_buff.Add(packet);//new packet will be an object
+                        Captured_packet c_p = new Captured_packet();
+                        
+                       
                         if (mac_dest != "")//dest already in the cam tab
                         {
                             
                             if (name == port_name)//we are not sending back on the cur port
                             {
                                 //h_loop.run_handler(packet);
-                                
+                                c_p.set_packet(packet, false);
                             }
                             
-                            if (name != port_name)
+                            else if (name != port_name)
                             {
                                 h.run_handler(packet);
-                                
+                                c_p.set_packet(packet, true);
                             }
                         }
                         else//broadcast everywhere except current port
                         {
                             h.run_handler(packet);
+                            c_p.set_packet(packet, true);
                         }
-                        
+                        packet_buff.Add(c_p);//new packet will be an object
+
 
 
 

@@ -9,11 +9,12 @@ namespace c_sharp_test_2
     class Table_update//run thread to update
     {
         private string name;
-
+        private Boolean port_out;
         private Packet packet;
-        private BlockingCollection<Packet> packet_buf;//check if LIFO behavior-------------------------------------------
+        private Captured_packet c_p;
+        private BlockingCollection<Captured_packet> packet_buf;//check if LIFO behavior-------------------------------------------
         private Form1 myform;
-        public void set_table(string name,Form1 f, BlockingCollection<Packet> p)
+        public void set_table(string name,Form1 f, BlockingCollection<Captured_packet> p)
         {
             this.name = name;
             
@@ -28,7 +29,9 @@ namespace c_sharp_test_2
             
             while (true)
             {
-                packet = packet_buf.Take();
+                c_p = packet_buf.Take();
+                packet = c_p.get_packet();
+                port_out = c_p.get_port_out();
                 int[] num_packets = new int[14]; //test
                 if (name == "one")
                 {
@@ -43,23 +46,27 @@ namespace c_sharp_test_2
                 if (packet.DataLink.Kind.ToString() == "Ethernet") // toto spojit
                 {
                     num_packets[6]++;
-                    num_packets[13]++;
+                    if (port_out == true) { num_packets[13]++; }
+                    
                     if (packet.Ethernet.EtherType.ToString() == "IpV4")
                     {
                         num_packets[5]++;
-                        num_packets[12]++;
+                        if (port_out == true) { num_packets[12]++; }
+                        
                         Console.WriteLine(packet.Ethernet.IpV4.Protocol);
                         if (packet.Ethernet.IpV4.Protocol.ToString() == "Tcp")
                         {
                             if (packet.Ethernet.IpV4.Tcp.SourcePort == 80 || packet.Ethernet.IpV4.Tcp.DestinationPort == 80)
                             {
                                 num_packets[4]++;
-                                num_packets[11]++;
+                                if (port_out == true) { num_packets[11]++; }
+                                
                             }
                             else
                             {
                                 num_packets[0]++;
-                                num_packets[7]++;
+                                if (port_out == true) { num_packets[7]++; }
+                                
                             }
 
 
@@ -68,19 +75,22 @@ namespace c_sharp_test_2
                         else if (packet.Ethernet.IpV4.Protocol.ToString() == "Udp")
                         {
                             num_packets[1]++;
-                            num_packets[8]++;
+                            if (port_out == true) { num_packets[8]++; }
+                            
                         }
                         else if (packet.Ethernet.IpV4.Protocol.ToString() == "InternetControlMessageProtocol")
                         {
                             num_packets[2]++;
-                            num_packets[9]++;
+                            if (port_out == true) { num_packets[9]++; }
+                            
                         }
 
                     }
                     else if (packet.Ethernet.EtherType.ToString() == "Arp")
                     {
                         num_packets[3]++;
-                        num_packets[10]++;
+                        if (port_out == true) { num_packets[10]++; }
+                        
                     }
 
                 }
