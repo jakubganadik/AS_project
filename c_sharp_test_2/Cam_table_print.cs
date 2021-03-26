@@ -13,12 +13,13 @@ namespace c_sharp_test_2
         }
         public void run_cam_print()
         {
+            Thread.Sleep(1000);
             while (true)
             {
-                Thread.Sleep(1000);
+                
 
                 myform.Invoke(myform.myDelegate_3);
-                Thread.Sleep(2000);
+                Thread.Sleep(1000);
             }
             
 

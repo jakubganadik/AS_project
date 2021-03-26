@@ -28,7 +28,9 @@ namespace c_sharp_test_2
         private int max_time;
         private bool remove_cam_val;
         private int size;
+        private int counter_cam_num;
         static readonly object _object = new object();
+        private int[] empty_tab;
         private bool cleared_table;
         public Form1()
         {
@@ -37,7 +39,7 @@ namespace c_sharp_test_2
             myDelegate = new AddListItem(update_values);
             myDelegate_2 = new AddListItem(update_values_2);
             myDelegate_3 = new AddListItem(update_cam);
-            max_time = 10;
+            //max_time = 10;
             cleared_table = false;
 
         }
@@ -169,7 +171,8 @@ namespace c_sharp_test_2
             i = 1;
             cur_i = 0;
             remove_cam_val = false;
-            
+            counter_cam_num = 0;
+            //int[] empty_tab = new int[3];
             lock (_object)
             {
                 if (cleared_table == true)
@@ -178,9 +181,10 @@ namespace c_sharp_test_2
                     cleared_table = false;
                 }
                 if (a != null)
-                {   //odpocitavat podla poctu tabuliek
-                    foreach (Cam_table c in a)//upravit tento bullshit a pridat lock na cele toto
+                {   //arr with updated values
+                    foreach (Cam_table c in a)
                     {
+                        counter_cam_num++;
                         foreach (TextBox tb in groupBox3.Controls.OfType<TextBox>())
                         {
                             if (tb.TabIndex < 3 * i && tb.TabIndex >= 3 * i - 3)
@@ -217,13 +221,16 @@ namespace c_sharp_test_2
                                 {
                                     if (c != null)
                                     {
-                                        tb.Text = c.get_timer();
+                                        
 
-                                        cur_time = Int32.Parse(c.get_timer().Substring(6, 2));
+                                        cur_time = c.get_timer();
 
-                                        if (cur_time > max_time)
+                                        if (cur_time < 0)
                                         {
                                             remove_cam_val = true;
+                                        }
+                                        else{
+                                            tb.Text = cur_time.ToString();
                                         }
                                     }
                                     else
@@ -257,8 +264,9 @@ namespace c_sharp_test_2
                         BlockingCollection<Cam_table> b = new BlockingCollection<Cam_table>();//prerobit
                         foreach (Cam_table c in a)
                         {
-                            cur_time = Int32.Parse(c.get_timer().Substring(6, 2));
-                            if (cur_time <= max_time)
+                            cur_time = c.get_timer();
+                            //cur_time = c.get_timer();
+                            if (cur_time >= 0) //bolo <0
                             {
                                 up_cams[i] = c;
                                 i++;
@@ -290,7 +298,8 @@ namespace c_sharp_test_2
                         }
                         a = b;
                         Packet_counter.cam_values = a;
-                         foreach (int rem in removed_cams)
+                        /*
+                        foreach (int rem in removed_cams)
                         {
                             foreach (TextBox tb in groupBox3.Controls.OfType<TextBox>())
                             {
@@ -300,6 +309,25 @@ namespace c_sharp_test_2
                                 }
 
                             }
+                        }
+                        */
+                        foreach (TextBox tb in groupBox3.Controls.OfType<TextBox>())
+                        {
+                            
+                            tb.Text = "";
+                            
+
+                        }
+
+                    }
+                }
+                for (i = counter_cam_num+1; i < 3; i++)//size of the table
+                {
+                    foreach (TextBox tb in groupBox3.Controls.OfType<TextBox>())
+                    {
+                        if (tb.TabIndex < 3 * (i + 1) && tb.TabIndex >= 3 * i - 2)
+                        {
+                            tb.Text = "";
                         }
                     }
                 }
@@ -413,6 +441,7 @@ namespace c_sharp_test_2
         {
             
             max_time = Int32.Parse(textBox29.Text);
+            Packet_counter.val_for_timer = max_time;
         }
 
         private void button2_Click(object sender, EventArgs e)

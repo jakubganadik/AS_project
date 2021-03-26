@@ -67,7 +67,7 @@ namespace c_sharp_test_2
             string name_1, name_2;
             name_1 = "one";
             name_2 = "two";
-
+            Packet_counter.val_for_timer = 10;
             PacketCommunicator communicator_lis_1 = selectedDevice_1.Open(65536, PacketDeviceOpenAttributes.Promiscuous | PacketDeviceOpenAttributes.NoCaptureLocal, 1000); // promiscuous mode
             PacketCommunicator communicator_lis_2 = selectedDevice_2.Open(65536, PacketDeviceOpenAttributes.Promiscuous | PacketDeviceOpenAttributes.NoCaptureLocal, 1000);
             // new part

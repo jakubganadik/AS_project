@@ -10,8 +10,15 @@ namespace c_sharp_test_2
         private string port;
         private int timer;
         private Stopwatch stopwatch;
-        public void set_cam(string m, string p)
+        private int cur_time;
+        private int cur_time_h;
+        private int cur_time_m;
+        private int cur_time_s;
+        private int max_time;
+        private string time_passed;
+        public void set_cam(string m, string p,int ma)
         {
+            this.max_time = ma;
             this.MAC = m;
             this.port = p;
             Stopwatch stopwatch = new Stopwatch();
@@ -19,8 +26,9 @@ namespace c_sharp_test_2
             // Begin timing.
             this.stopwatch.Start();
         }
-        public void set_timer()
+        public void set_timer(int ma)
         {
+            this.max_time = ma;
             stopwatch.Restart();
             //this.stopwatch.Stop();
             //this.stopwatch.Start();
@@ -53,15 +61,26 @@ namespace c_sharp_test_2
             }
             
         }
-        public string get_timer()
+        public int get_timer()
         {
+            
+            //max_time = Packet_counter.val_for_timer;
             if (stopwatch.Elapsed.ToString() == null)
             {
-                return "";
+                return 0;
             }
             else
-            {
-                return this.stopwatch.Elapsed.ToString();
+            {//uprava casu
+                time_passed = stopwatch.Elapsed.ToString();
+                cur_time_h = 3600 * Int32.Parse(time_passed.Substring(0, 2));
+                cur_time_m = 60*Int32.Parse(time_passed.Substring(3, 2));
+                cur_time_s = Int32.Parse(time_passed.Substring(6, 2));
+                cur_time = max_time - cur_time_h - cur_time_m - cur_time_s ;// sa odcita na mieste
+                if (cur_time < 0)//warn when reaches zero
+                {
+                    cur_time = -1;
+                }
+                return cur_time;
             }
             
         }

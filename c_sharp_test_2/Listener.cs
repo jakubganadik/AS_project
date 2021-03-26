@@ -20,7 +20,7 @@ namespace c_sharp_test_2
         private Form1 myform;
         private string mac_dest;
         private BlockingCollection<Cam_table> tbl;
-        
+        private int max_time;
         private bool has_src;
         private bool has_dst;
         private bool not_a_pc;
@@ -105,16 +105,17 @@ namespace c_sharp_test_2
                         not_a_pc = true;
                         if (packet.Ethernet.Source.ToString()[1] == '0' || packet.Ethernet.Source.ToString()[1] == '4' || packet.Ethernet.Source.ToString()[1] == '8' || packet.Ethernet.Source.ToString()[1] == 'C') //kontrola zariadenia
                         {
+                            
                             not_a_pc = false;
                             has_src = false;
-                            
+                            max_time = Packet_counter.val_for_timer;
                             tbl =Packet_counter.cam_values;
                             //if empty
                             if (tbl == null)
                             {
                                 Cam_table c = new Cam_table();
                                 
-                                c.set_cam(packet.Ethernet.Source.ToString(), name);
+                                c.set_cam(packet.Ethernet.Source.ToString(), name,max_time);
                                 
                                 
                                 tbl.Add(c);
@@ -129,7 +130,7 @@ namespace c_sharp_test_2
                                     {
                                         if (t.get_mac() == packet.Ethernet.Source.ToString())
                                         {
-                                            t.set_timer();
+                                            t.set_timer(max_time);//timer
                                             t.set_port(name);
                                             has_src = true;
                                         }
@@ -146,7 +147,7 @@ namespace c_sharp_test_2
                                 {
                                     Cam_table c = new Cam_table();
                                     
-                                    c.set_cam(packet.Ethernet.Source.ToString(), name);
+                                    c.set_cam(packet.Ethernet.Source.ToString(), name,max_time);
                                    
                                     
                                     tbl.Add(c);
@@ -166,14 +167,17 @@ namespace c_sharp_test_2
                         
 
                         //determine where to send
-                        packet_buff.Add(packet);//new packet added
+                        packet_buff.Add(packet);//new packet will be an object
                         if (mac_dest != "")//dest already in the cam tab
                         {
-                            if (name == port_name)//we are sending back on this port
+                            
+                            if (name == port_name)//we are not sending back on the cur port
                             {
-                                h_loop.run_handler(packet);
+                                //h_loop.run_handler(packet);
+                                
                             }
-                            else
+                            
+                            if (name != port_name)
                             {
                                 h.run_handler(packet);
                                 
