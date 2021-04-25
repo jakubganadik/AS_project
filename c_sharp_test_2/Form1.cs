@@ -17,13 +17,16 @@ namespace c_sharp_test_2
         public AddListItem myDelegate;
         public AddListItem myDelegate_2;
         public AddListItem myDelegate_3;
+        public AddListItem myDelegate_rules;
         private int i;
         private int j;
         private int help_print;
         private bool one_row;
         private int cur_i;
-        private Cam_table[] up_cams;
-        private int[] removed_cams;
+        //private Cam_table[] up_cams;
+        //private int[] removed_cams;
+        private List<Cam_table> up_cams;
+        private List<int> removed_cams;
         private int cur_time;
         private int max_time;
         private bool remove_cam_val;
@@ -32,6 +35,11 @@ namespace c_sharp_test_2
         static readonly object _object = new object();
         private int[] empty_tab;
         private bool cleared_table;
+        private string to_print;
+        private BlockingCollection<Rule> lor;
+        private string rule_str;
+        private int rule_remove;
+        private List<Rule> remaining_rules;
         public Form1()
         {
             InitializeComponent();
@@ -39,6 +47,7 @@ namespace c_sharp_test_2
             myDelegate = new AddListItem(update_values);
             myDelegate_2 = new AddListItem(update_values_2);
             myDelegate_3 = new AddListItem(update_cam);
+            myDelegate_rules = new AddListItem(update_rules);
             //max_time = 10;
             cleared_table = false;
 
@@ -126,8 +135,9 @@ namespace c_sharp_test_2
             j = 0;
             size = 0;
             BlockingCollection<Cam_table> a = Packet_counter.cam_values;
-            int[] removed_cams = new int[4];
-            Cam_table[] up_cams = new Cam_table[4];
+            
+            //int[] removed_cams = new int[4];
+            //Cam_table[] up_cams = new Cam_table[4];
             BlockingCollection<Cam_table> b = new BlockingCollection<Cam_table>();//prerobit
             foreach (Cam_table c in a)
             {
@@ -147,14 +157,29 @@ namespace c_sharp_test_2
             }
             a = b;
             Packet_counter.cam_values = a;
+            /*
             foreach (TextBox tb in groupBox3.Controls.OfType<TextBox>())
             {
                 tb.Text = "";
 
             }
+            */
+            richTextBox1.Text = " ";
 
 
 
+        }
+        private void update_rules()
+        {
+            lor = Packet_counter.List_of_rules;
+            rule_str = "";
+            i = 0;
+            foreach (Rule r in lor)
+            {
+                rule_str += "| "+i.ToString() + " src_mac " + r.get_mac_src() + " dst_mac " + r.get_mac_dst() + " ip_src " + r.get_ip_src() + " ip_dst " + r.get_ip_dst() + " filter " + r.get_filter() + " io " + r.get_io() + " " + r.get_excp() + "|"+"\n";
+                i++;
+            }
+            richTextBox2.Text = rule_str;
         }
         public void update_cam()//after the first cam table update run a delegate with a thread in it
         {
@@ -165,7 +190,8 @@ namespace c_sharp_test_2
             BlockingCollection<Cam_table> a = Packet_counter.cam_values;//wont work if its empty
                                                                         //a.CopyTo();
 
-
+            List<int> removed_cams = new List<int>();
+            List<Cam_table> up_cams = new List<Cam_table>();
             //different approach, solve the controls
             one_row = false;
             i = 1;
@@ -173,6 +199,7 @@ namespace c_sharp_test_2
             remove_cam_val = false;
             counter_cam_num = 0;
             //int[] empty_tab = new int[3];
+            
             lock (_object)
             {
                 if (cleared_table == true)
@@ -182,9 +209,18 @@ namespace c_sharp_test_2
                 }
                 if (a != null)
                 {   //arr with updated values
+                    to_print = "";
                     foreach (Cam_table c in a)
                     {
+                        cur_time = c.get_timer();
+                        to_print+= c.get_mac() + " " + c.get_port() + " " + cur_time + "\n";
+                        
                         counter_cam_num++;
+                        if (cur_time < 0)
+                        {
+                            remove_cam_val = true;
+                        }
+                        /*
                         foreach (TextBox tb in groupBox3.Controls.OfType<TextBox>())
                         {
                             if (tb.TabIndex < 3 * i && tb.TabIndex >= 3 * i - 3)
@@ -251,16 +287,20 @@ namespace c_sharp_test_2
 
 
                         }
+                        */
                         i++;
                     }
-
+                    //richTextBox1.Text = "";
+                    richTextBox1.Text = to_print;
                     i = 0;
                     if (remove_cam_val == true)
                     {
                         j = 0;
                         size = 0;
-                        int[] removed_cams = new int[4];
-                        Cam_table[] up_cams = new Cam_table[4];
+                        //int[] removed_cams = new int[4];
+                        //Cam_table[] up_cams = new Cam_table[4];
+                        //List<int> removed_cams = new List<int>();
+                        //List<Cam_table> up_cams = new List<Cam_table>();
                         BlockingCollection<Cam_table> b = new BlockingCollection<Cam_table>();//prerobit
                         foreach (Cam_table c in a)
                         {
@@ -268,12 +308,14 @@ namespace c_sharp_test_2
                             //cur_time = c.get_timer();
                             if (cur_time >= 0) //bolo <0
                             {
-                                up_cams[i] = c;
+                                up_cams.Add(c);
+                                //up_cams[i] = c;
                                 i++;
                             }
                             else
                             {
-                                removed_cams[j] = j + 1;
+                                removed_cams.Add(j + 1);
+                                //removed_cams[j] = j + 1;
                                 j++;
                             }
                             size++;
@@ -311,6 +353,7 @@ namespace c_sharp_test_2
                             }
                         }
                         */
+                        /*
                         foreach (TextBox tb in groupBox3.Controls.OfType<TextBox>())
                         {
                             
@@ -318,11 +361,32 @@ namespace c_sharp_test_2
                             
 
                         }
+                        */
+                        richTextBox1.Text = "";
+                        to_print = "";
+                        foreach (Cam_table c in up_cams)
+                        {
+
+                            to_print+= c.get_mac() + " " + c.get_port() + " " + c.get_timer() + "\n";
+                        }
+                        richTextBox1.Text = to_print;
 
                     }
                 }
+                /*
+                i = counter_cam_num + 0;
+                to_print = "";
+                foreach (Cam_table c in up_cams)
+                {
+
+                    to_print = c.get_mac() + " " + c.get_port() + " " + c.get_timer() + "\n";
+                }
+                richTextBox1.Text = to_print;
+                */
+                /*
                 for (i = counter_cam_num+1; i < 3; i++)//size of the table
                 {
+
                     foreach (TextBox tb in groupBox3.Controls.OfType<TextBox>())
                     {
                         if (tb.TabIndex < 3 * (i + 1) && tb.TabIndex >= 3 * i - 2)
@@ -331,6 +395,7 @@ namespace c_sharp_test_2
                         }
                     }
                 }
+                */
             }
             
         }
@@ -447,6 +512,71 @@ namespace c_sharp_test_2
         private void button2_Click(object sender, EventArgs e)
         {
             cleared_table = true;
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            Rules_parser r_p = new Rules_parser();
+            r_p.set_form(this);
+            r_p.set_rules(textBox30.Text);
+
+        }
+
+        private void richTextBox2_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            
+            try
+            {
+                rule_remove = Int32.Parse(textBox31.Text);
+                lor = Packet_counter.List_of_rules;
+                List<Rule> rem = new List<Rule>();
+                BlockingCollection<Rule> b_r = new BlockingCollection<Rule>();
+                i = 0;
+                foreach (Rule r in lor)
+                {
+                    if (i != rule_remove)
+                    {
+                        rem.Add(r);
+                    }
+                    i++;
+                    
+                }
+                richTextBox2.Clear();
+                rule_str = "";
+                i = 0;
+                foreach (Rule r in rem)
+                {
+                    rule_str +=  "|"+i.ToString() + " src_mac " + r.get_mac_src() + " dst_mac " + r.get_mac_dst() + " ip_src " + r.get_ip_src() + " ip_dst " + r.get_ip_dst() + " filter " + r.get_filter() + " io " + r.get_io() + " "+ r.get_excp()+"|"+"\n";
+                    i++;
+                    b_r.Add(r);
+                }
+                richTextBox2.Text = rule_str;
+                Packet_counter.List_of_rules = b_r;
+
+                    /*
+                    foreach (Rule r in lor.GetConsumingEnumerable())
+                    {
+
+                    }
+
+                    */
+
+                }
+            catch
+            {
+                textBox31.Text = "nebolo zadane cislo";
+            }
+
+        }
+
+        private void textBox31_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

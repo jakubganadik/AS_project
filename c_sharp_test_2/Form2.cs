@@ -52,7 +52,8 @@ namespace c_sharp_test_2
 
 
         }
-        public Tuple<int,int> get_packet_device_index(){ //test
+        public Tuple<int, int> get_packet_device_index()
+        { //test
             return Tuple.Create(deviceIndex_1, deviceIndex_2);
         }
         private void label2_Click(object sender, EventArgs e)

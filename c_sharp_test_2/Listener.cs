@@ -20,11 +20,16 @@ namespace c_sharp_test_2
         private Form1 myform;
         private string mac_dest;
         private BlockingCollection<Cam_table> tbl;
+        private BlockingCollection<Rule> lor;
         private int max_time;
         private bool has_src;
         private bool has_dst;
         private bool not_a_pc;
         private string port_name;
+        private string p_type;
+        private bool filtered;
+        private string in_out;
+        private bool filtered_cam;
         public void list_get(PacketCommunicator pack_comm, string name, Packet_handler h, Form1 myform,string n_l,Packet_handler h_l)
         {
 
@@ -101,96 +106,264 @@ namespace c_sharp_test_2
                         //new_mac = 0;
                         //mozno samost
                         //-------------------------------------------------------------------------------------------
-                        mac_dest = "";
-                        not_a_pc = true;
-                        if (packet.Ethernet.Source.ToString()[1] == '0' || packet.Ethernet.Source.ToString()[1] == '4' || packet.Ethernet.Source.ToString()[1] == '8' || packet.Ethernet.Source.ToString()[1] == 'C') //kontrola zariadenia
-                        {
-                            
-                            not_a_pc = false;
-                            has_src = false;
-                            max_time = Packet_counter.val_for_timer;
-                            tbl =Packet_counter.cam_values;
-                            //if empty
-                            if (tbl == null)
-                            {
-                                Cam_table c = new Cam_table();
-                                
-                                c.set_cam(packet.Ethernet.Source.ToString(), name,max_time);
-                                
-                                
-                                tbl.Add(c);
-                                Packet_counter.cam_values = tbl;//zaznam v cam tab
+                        
 
-                            }
-                            else
+                        p_type = "";
+                        if (packet.DataLink.Kind.ToString() == "Ethernet") // toto spojit
+                        {
+                            p_type = "Ethernet";
+                            if (packet.Ethernet.EtherType.ToString() == "IpV4")
                             {
-                                foreach (Cam_table t in tbl)//osetrit null aj tu
+                                p_type = "IpV4";
+                                if (packet.Ethernet.IpV4.Protocol.ToString() == "Tcp")
                                 {
-                                    if (t != null)
-                                    {
-                                        if (t.get_mac() == packet.Ethernet.Source.ToString())
-                                        {
-                                            t.set_timer(max_time);//timer
-                                            t.set_port(name);
-                                            has_src = true;
-                                        }
-                                        if (t.get_mac() == packet.Ethernet.Destination.ToString())
-                                        {
-                                            mac_dest = t.get_mac();
-                                            port_name = t.get_port();
-                                        }
-                                    }
-                                    
+                                    p_type = "Tcp";
+                                }
+                                else if (packet.Ethernet.IpV4.Protocol.ToString() == "Udp")
+                                {
+                                    p_type = "Udp";
 
                                 }
-                                if (has_src == false)
+                                else if (packet.Ethernet.IpV4.Protocol.ToString() == "InternetControlMessageProtocol")
+                                {
+                                    p_type = "InternetControlMessageProtocol";
+
+                                }
+
+                            }
+                            else if (packet.Ethernet.EtherType.ToString() == "Arp")
+                            {
+                                p_type = "Arp";
+
+                            }
+                        }
+                        in_out = "";
+                        lor = Packet_counter.List_of_rules;
+                        filtered = false;//careful with all keyword
+                        filtered_cam = false;
+                        
+                        if (lor != null)
+                        {//exclusive
+                            foreach (Rule r in lor)//osetrit null aj tu
+                            {   //src and dst mac combination
+                                if (( (packet.Ethernet.Source.ToString().Equals(r.get_mac_src()) && packet.Ethernet.Destination.ToString().Equals(r.get_mac_dst())) || (packet.Ethernet.Source.ToString().Equals(r.get_mac_src()) && r.get_mac_dst().Equals("")) || (packet.Ethernet.Destination.ToString().Equals(r.get_mac_dst()) && r.get_mac_src().Equals(""))) || ((packet.Ethernet.IpV4.Source.ToString().Equals(r.get_ip_src()) && packet.Ethernet.IpV4.Destination.ToString().Equals(r.get_ip_dst())) || (packet.Ethernet.IpV4.Source.ToString().Equals(r.get_ip_src()) && r.get_ip_dst().Equals("")) || (packet.Ethernet.IpV4.Destination.ToString().Equals(r.get_ip_dst()) && r.get_ip_src().Equals(""))))//last rule goes packet.Ethernet.Source.ToString().Equals(r.get_mac()) || packet.Ethernet.IpV4.Source.ToString().Equals(r.get_ip())
+
+
+                                {
+                                    if (p_type.Equals(r.get_filter()) && r.get_excp().Equals("")) // if nothing, then filter everything
+                                    {
+                                        if ((packet.Ethernet.Source.ToString()[1] == '0' || packet.Ethernet.Source.ToString()[1] == '4' || packet.Ethernet.Source.ToString()[1] == '8' || packet.Ethernet.Source.ToString()[1] == 'C') && (p_type == "InternetControlMessageProtocol" || p_type == "Arp") && r.get_io() == "IN")
+                                        {
+                                            filtered_cam = true;
+                                        }
+                                        else if ((packet.Ethernet.Source.ToString()[1] == '0' || packet.Ethernet.Source.ToString()[1] == '4' || packet.Ethernet.Source.ToString()[1] == '8' || packet.Ethernet.Source.ToString()[1] == 'C') && (p_type == "InternetControlMessageProtocol" || p_type == "Arp") && r.get_io() == "OUT")
+                                        {
+                                            filtered_cam = false;
+                                        }
+
+                                        filtered = true;
+                                        in_out = r.get_io();
+                                        
+                                        if (p_type == "Udp" && packet.Ethernet.IpV4.Udp.SourcePort.ToString() != r.get_port()) // test for port
+                                        {
+                                            filtered = false;
+                                            in_out = "";
+                                        }
+                                        
+
+
+                                    }
+                                    else if (p_type.Equals(r.get_filter()) && r.get_excp().Equals("exc"))
+                                    {
+                                        if (r.get_io() == "")
+                                        {
+                                            filtered = false;
+                                            in_out = r.get_io();
+                                            filtered_cam = false;
+                                        }
+                                        else
+                                        {
+                                            filtered = true;
+                                            in_out = r.get_io();
+                                            filtered_cam = true;
+                                        }
+                                        
+                                    }
+
+                                    //if ((packet.Ethernet.IpV4.Source.ToString().Equals(r.get_ip_src()) && packet.Ethernet.IpV4.Destination.ToString().Equals(r.get_ip_dst())) || (packet.Ethernet.IpV4.Source.ToString().Equals(r.get_ip_src()) && r.get_ip_dst().Equals("")) || (packet.Ethernet.IpV4.Destination.ToString().Equals(r.get_ip_dst()) && r.get_ip_src().Equals("")))
+                                    else if (p_type != r.get_filter() && r.get_excp().Equals("exc"))
+                                    {
+
+                                        filtered = true;
+                                        filtered_cam = true;
+                                        /*
+                                        if (r.get_io().Equals("OUT"))
+                                        {
+                                            filtered_cam = false;
+                                        }
+                                        
+                                        in_out = r.get_io();
+                                        */
+                                        in_out = "IN";
+                                    }
+
+
+
+                                }
+                                /*
+                                else if (r.get_exec().Equals("exc"))
+                                {
+                                    if ((packet.Ethernet.Source.ToString()[1] == '0' || packet.Ethernet.Source.ToString()[1] == '4' || packet.Ethernet.Source.ToString()[1] == '8' || packet.Ethernet.Source.ToString()[1] == 'C') && p_type == "InternetControlMessageProtocol" && r.get_io() == "IN")
+                                    {
+                                        filtered_cam = true;
+                                    }
+                                    filtered = true;
+                                    in_out = r.get_io();
+                                }
+                                */
+                                else if(r.get_mac_dst().Equals("") && r.get_mac_src().Equals("") && r.get_ip_dst().Equals("") && r.get_ip_src().Equals("")) //urobit aj pre except
+                                {
+                                    if (p_type.Equals(r.get_filter()) && r.get_excp() == "")
+                                    {
+                                        filtered = true;
+                                        in_out = r.get_io();
+                                        if (p_type == "Udp" && packet.Ethernet.IpV4.Udp.SourcePort.ToString() != r.get_port()) // test for port
+                                        {
+                                            filtered = false;
+                                            in_out = "";
+                                        }
+                                    }
+                                    else if (p_type.Equals(r.get_filter()) && r.get_excp() == "exc")
+                                    {
+                                        filtered = false;
+                                        in_out = "";
+                                        if (p_type == "Udp" && packet.Ethernet.IpV4.Udp.SourcePort.ToString() != r.get_port()) // test for port
+                                        {
+                                            filtered = true;
+                                            in_out = r.get_io();
+                                        }
+                                    }
+                                    else if (p_type != r.get_filter() && r.get_excp() == "exc"){
+                                        filtered = true;
+                                        in_out = r.get_io();//in_out = r.get_io()
+
+                                    }
+                                    
+                                    
+                                    
+                                }
+                                /*
+                                else if (r.get_excp() == "exc")
+                                {
+                                    in_out = "IN";
+                                    filtered = true;
+                                    filtered_cam = true;
+                                }
+                                */
+
+                            }
+                        }
+                        if (filtered_cam == false)
+                        {
+                            mac_dest = "";
+                            not_a_pc = true;
+                            if (packet.Ethernet.Source.ToString()[1] == '0' || packet.Ethernet.Source.ToString()[1] == '4' || packet.Ethernet.Source.ToString()[1] == '8' || packet.Ethernet.Source.ToString()[1] == 'C') //kontrola zariadenia
+                            {
+
+                                not_a_pc = false;
+                                has_src = false;
+                                max_time = Packet_counter.val_for_timer;
+                                tbl = Packet_counter.cam_values;
+                                //if empty
+                                if (tbl == null)
                                 {
                                     Cam_table c = new Cam_table();
-                                    
-                                    c.set_cam(packet.Ethernet.Source.ToString(), name,max_time);
-                                   
-                                    
+
+                                    c.set_cam(packet.Ethernet.Source.ToString(), name, max_time, packet.Ethernet.IpV4.Source.ToString());
+
+
                                     tbl.Add(c);
                                     Packet_counter.cam_values = tbl;//zaznam v cam tab
 
                                 }
+                                else
+                                {
+                                    foreach (Cam_table t in tbl)//osetrit null aj tu
+                                    {
+                                        if (t != null)
+                                        {
+                                            if (t.get_mac() == packet.Ethernet.Source.ToString())
+                                            {
+                                                t.set_timer(max_time);//timer
+                                                t.set_port(name);
+                                                has_src = true;
+                                            }
+                                            if (t.get_mac() == packet.Ethernet.Destination.ToString())
+                                            {
+                                                mac_dest = t.get_mac();
+                                                port_name = t.get_port();
+                                            }
+                                        }
+
+
+                                    }
+
+
+                                    if (has_src == false)
+                                    {
+                                        Cam_table c = new Cam_table();
+
+                                        c.set_cam(packet.Ethernet.Source.ToString(), name, max_time, packet.Ethernet.IpV4.Source.ToString());
+
+
+                                        tbl.Add(c);
+                                        Packet_counter.cam_values = tbl;//zaznam v cam tab
+
+                                    }
+                                }
+
+                                //send
+
+
+
                             }
-                            
-                            //send
-                            
-
-
                         }
-                        //iny thread a funkcia
-                        //---------------------------------------------------------------------------------------------
-
-
-
-                        //determine where to send
-                        Captured_packet c_p = new Captured_packet();
                         
-                       
-                        if (mac_dest != "")//dest already in the cam tab
+
+
+                        //---------------------------------determine in out----------------------------------------------------
+                        //determine where to send
+
+                        Captured_packet c_p = new Captured_packet();
+
+                        if (filtered == false)
                         {
-                            
-                            if (name == port_name)//we are not sending back on the cur port
+                            if (mac_dest != "")//dest already in the cam tab
                             {
-                                //h_loop.run_handler(packet);
-                                c_p.set_packet(packet, false);
+
+                                if (name == port_name)//we are not sending back on the cur port
+                                {
+                                    //h_loop.run_handler(packet);
+                                    //c_p.set_packet(packet, in_out,p_type);
+                                }
+
+                                else if (name != port_name)
+                                {
+                                    h.run_handler(packet);
+                                    //c_p.set_packet(packet,  in_out, p_type);
+                                }
                             }
-                            
-                            else if (name != port_name)
+                            else//broadcast everywhere except current port
                             {
                                 h.run_handler(packet);
-                                c_p.set_packet(packet, true);
+                                //c_p.set_packet(packet,  in_out, p_type);
                             }
                         }
-                        else//broadcast everywhere except current port
-                        {
-                            h.run_handler(packet);
-                            c_p.set_packet(packet, true);
-                        }
-                        packet_buff.Add(c_p);//new packet will be an object
+                        
+                        c_p.set_packet(packet, in_out, p_type);
+                        packet_buff.Add(c_p);//print vals
+
+
 
 
 

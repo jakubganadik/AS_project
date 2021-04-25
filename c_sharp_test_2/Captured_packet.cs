@@ -8,20 +8,28 @@ namespace c_sharp_test_2
     {
         private Packet packet;
         private Boolean port_out;
-        public void set_packet(Packet p,Boolean p_o)
+        private string in_out;
+        private string p_type;
+        public void set_packet(Packet p,string io,string t)
         {
             this.packet = p;
-            this.port_out = p_o;
+            in_out = io;
+            p_type = t;
         }
         public Packet get_packet()
         {
             
             return this.packet;
         }
-        public Boolean get_port_out()
+        public string get_io()
         {
 
-            return this.port_out;
+            return in_out;
+        }
+        public string get_packet_type()
+        {
+
+            return p_type;
         }
     }
 }

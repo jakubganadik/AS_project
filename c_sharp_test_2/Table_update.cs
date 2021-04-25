@@ -5,13 +5,14 @@ using PcapDotNet.Packets;
 using System.Collections.Concurrent;
 namespace c_sharp_test_2
 {
-    
+    //exc a IN nefunguju
     class Table_update//run thread to update
     {
         private string name;
-        private Boolean port_out;
+        private string port_out;
         private Packet packet;
         private Captured_packet c_p;
+        private string p_type;
         private BlockingCollection<Captured_packet> packet_buf;//check if LIFO behavior-------------------------------------------
         private Form1 myform;
         public void set_table(string name,Form1 f, BlockingCollection<Captured_packet> p)
@@ -31,7 +32,8 @@ namespace c_sharp_test_2
             {
                 c_p = packet_buf.Take();
                 packet = c_p.get_packet();
-                port_out = c_p.get_port_out();
+                port_out = c_p.get_io();
+                p_type = c_p.get_packet_type();
                 int[] num_packets = new int[14]; //test
                 if (name == "one")
                 {
@@ -43,53 +45,152 @@ namespace c_sharp_test_2
                 }
                 //update form for cam
 
-                if (packet.DataLink.Kind.ToString() == "Ethernet") // toto spojit
+                if (p_type == "Ethernet" || p_type == "IpV4" || p_type == "Tcp" || p_type == "Udp" || p_type == "InternetControlMessageProtocol" || p_type == "Arp") // toto spojit
                 {
-                    num_packets[6]++;
-                    if (port_out == true) { num_packets[13]++; }
+                    if (port_out == "IN") { 
+                         
+                    }
                     
-                    if (packet.Ethernet.EtherType.ToString() == "IpV4")
-                    {
-                        num_packets[5]++;
-                        if (port_out == true) { num_packets[12]++; }
                         
-                        Console.WriteLine(packet.Ethernet.IpV4.Protocol);
-                        if (packet.Ethernet.IpV4.Protocol.ToString() == "Tcp")
+                        
+                    
+                    else if (port_out == "OUT") {
+                        num_packets[6]++;
+                         
+                    }
+                    else
+                    {
+                        num_packets[6]++;
+                        num_packets[13]++;
+                    }
+
+
+                    if (p_type == "IpV4" || p_type == "Tcp" || p_type == "Udp" || p_type == "InternetControlMessageProtocol")
+                    {
+                        if (port_out == "IN")
+                        {
+
+                        }
+
+                        else if (port_out == "OUT")
+                        {
+                            num_packets[5]++;
+                        }
+                        else
+                        {
+                            num_packets[5]++;
+                            num_packets[12]++;
+                        }
+                            
+                        
+                        
+                        
+                        if (p_type == "Tcp")
                         {
                             if (packet.Ethernet.IpV4.Tcp.SourcePort == 80 || packet.Ethernet.IpV4.Tcp.DestinationPort == 80)
                             {
-                                num_packets[4]++;
-                                if (port_out == true) { num_packets[11]++; }
+                                if (port_out == "IN")
+                                {
+
+                                }
+
+                                else if (port_out == "OUT")
+                                {
+                                    num_packets[4]++;
+                                }
+                                else
+                                {
+                                    num_packets[4]++;
+                                    num_packets[11]++;
+                                }
+                                
+                                
                                 
                             }
                             else
                             {
-                                num_packets[0]++;
-                                if (port_out == true) { num_packets[7]++; }
+                                if (port_out == "IN")
+                                {
+
+                                }
+
+                                else if (port_out == "OUT")
+                                {
+                                    num_packets[0]++;
+                                }
+                                else
+                                {
+                                    num_packets[0]++;
+                                    num_packets[7]++;
+                                }
+                                
+                                
                                 
                             }
 
 
 
                         }
-                        else if (packet.Ethernet.IpV4.Protocol.ToString() == "Udp")
+                        else if (p_type == "Udp")
                         {
-                            num_packets[1]++;
-                            if (port_out == true) { num_packets[8]++; }
+                            if (port_out == "IN")
+                            {
+
+                            }
+
+                            else if (port_out == "OUT")
+                            {
+                                num_packets[1]++;
+                            }
+                            else
+                            {
+                                num_packets[1]++;
+                                num_packets[8]++;
+                            }
+                            
+                            
                             
                         }
-                        else if (packet.Ethernet.IpV4.Protocol.ToString() == "InternetControlMessageProtocol")
+                        else if (p_type == "InternetControlMessageProtocol")
                         {
-                            num_packets[2]++;
-                            if (port_out == true) { num_packets[9]++; }
+                            if (port_out == "IN")
+                            {
+
+                            }
+
+                            else if (port_out == "OUT")
+                            {
+                                num_packets[2]++;
+                            }
+                            else
+                            {
+                                num_packets[2]++;
+                                num_packets[9]++;
+                            }
+                            
+                            
                             
                         }
 
                     }
-                    else if (packet.Ethernet.EtherType.ToString() == "Arp")
+                    else if (p_type == "Arp")
                     {
-                        num_packets[3]++;
-                        if (port_out == true) { num_packets[10]++; }
+                        if (port_out == "IN")
+                        {
+
+                        }
+
+                        else if (port_out == "OUT")
+                        {
+                            num_packets[3]++;
+                        }
+                        else
+                        {
+                            num_packets[3]++;
+                            num_packets[10]++;
+                        }
+                        
+                        
                         
                     }
 

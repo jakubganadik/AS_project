@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using PcapDotNet.Core;
 using System.Windows.Forms;
 using System.Threading;
+using System.Collections.Concurrent;
 namespace c_sharp_test_2
 {
     class Program
@@ -18,14 +19,14 @@ namespace c_sharp_test_2
             myForm_2.set_form(myForm_2);
             Application.Run(myForm_2);//Form1 myForm = new Form1();
 
-            (deviceIndex_1, deviceIndex_2)= myForm_2.get_packet_device_index(); // test
-            
+            (deviceIndex_1, deviceIndex_2) = myForm_2.get_packet_device_index(); // test
+
             Form1 myForm = new Form1();
-            
+
 
             Gui gui = new Gui();
 
-            
+
 
 
 
@@ -47,7 +48,7 @@ namespace c_sharp_test_2
             // Retrieve the device list from the local machine
             //vypise ssa do dalsieho okna
 
-
+            
             // Take the selected adapter
             Cam_table_print c = new Cam_table_print();
             c.set(myForm);
@@ -68,14 +69,17 @@ namespace c_sharp_test_2
             name_1 = "one";
             name_2 = "two";
             Packet_counter.val_for_timer = 10;
+            
+            BlockingCollection<Rule> lor = new BlockingCollection<Rule>();
+            Packet_counter.List_of_rules = lor;
             PacketCommunicator communicator_lis_1 = selectedDevice_1.Open(65536, PacketDeviceOpenAttributes.Promiscuous | PacketDeviceOpenAttributes.NoCaptureLocal, 1000); // promiscuous mode
             PacketCommunicator communicator_lis_2 = selectedDevice_2.Open(65536, PacketDeviceOpenAttributes.Promiscuous | PacketDeviceOpenAttributes.NoCaptureLocal, 1000);
             // new part
 
             h_1.get_device_send(communicator_lis_2, name_1);//IN port has a correct name and OUT has different
             h_2.get_device_send(communicator_lis_1, name_2);
-            lis_1.list_get(communicator_lis_1, name_1, h_1, myForm,name_2,h_2);
-            lis_2.list_get(communicator_lis_2, name_2, h_2, myForm,name_2,h_2);
+            lis_1.list_get(communicator_lis_1, name_1, h_1, myForm, name_2, h_2);
+            lis_2.list_get(communicator_lis_2, name_2, h_2, myForm, name_2, h_2);
             ThreadStart childref_1 = new ThreadStart(lis_1.recv);
             ThreadStart childref_2 = new ThreadStart(lis_2.recv);
             Thread childThread_1 = new Thread(childref_1);
@@ -106,16 +110,16 @@ namespace c_sharp_test_2
 
                 myForm.Invoke(myForm.myDelegate);
                 */
-                /*
-                event_1.Set();
-                event_1.Reset();
-                */
+            /*
+            event_1.Set();
+            event_1.Reset();
+            */
 
-                // update things in myOtherForm here
+            // update things in myOtherForm here
 
 
-            }
-            
         }
+
     }
+}
 //}

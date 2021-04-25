@@ -15,8 +15,9 @@ namespace c_sharp_test_2
         private int cur_time_m;
         private int cur_time_s;
         private int max_time;
+        private string ip;
         private string time_passed;
-        public void set_cam(string m, string p,int ma)
+        public void set_cam(string m, string p,int ma,string i)
         {
             this.max_time = ma;
             this.MAC = m;
@@ -25,6 +26,7 @@ namespace c_sharp_test_2
             this.stopwatch = stopwatch;
             // Begin timing.
             this.stopwatch.Start();
+            ip = i;
         }
         public void set_timer(int ma)
         {
@@ -60,6 +62,10 @@ namespace c_sharp_test_2
                 return this.port;
             }
             
+        }
+        public string get_ip()
+        {
+            return ip;
         }
         public int get_timer()
         {
