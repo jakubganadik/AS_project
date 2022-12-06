@@ -25,7 +25,7 @@ namespace c_sharp_test_2
         private int cur_i;
         //private Cam_table[] up_cams;
         //private int[] removed_cams;
-        private List<Cam_table> up_cams;
+        private List<CamTable> up_cams;
         private List<int> removed_cams;
         private int cur_time;
         private int max_time;
@@ -134,12 +134,12 @@ namespace c_sharp_test_2
         {
             j = 0;
             size = 0;
-            BlockingCollection<Cam_table> a = Packet_counter.cam_values;
+            BlockingCollection<CamTable> a = Packet_counter.cam_values;
             
             //int[] removed_cams = new int[4];
             //Cam_table[] up_cams = new Cam_table[4];
-            BlockingCollection<Cam_table> b = new BlockingCollection<Cam_table>();//prerobit
-            foreach (Cam_table c in a)
+            BlockingCollection<CamTable> b = new BlockingCollection<CamTable>();//prerobit
+            foreach (CamTable c in a)
             {
                 
                 size++;
@@ -147,7 +147,7 @@ namespace c_sharp_test_2
             }
             
             j = 0;
-            foreach (Cam_table item in a.GetConsumingEnumerable())
+            foreach (CamTable item in a.GetConsumingEnumerable())
             {
                 if (size == j + 1)
                 {
@@ -187,11 +187,11 @@ namespace c_sharp_test_2
 
             i = 0;
             help_print = 0;
-            BlockingCollection<Cam_table> a = Packet_counter.cam_values;//wont work if its empty
+            BlockingCollection<CamTable> a = Packet_counter.cam_values;//wont work if its empty
                                                                         //a.CopyTo();
 
             List<int> removed_cams = new List<int>();
-            List<Cam_table> up_cams = new List<Cam_table>();
+            List<CamTable> up_cams = new List<CamTable>();
             //different approach, solve the controls
             one_row = false;
             i = 1;
@@ -210,7 +210,7 @@ namespace c_sharp_test_2
                 if (a != null)
                 {   //arr with updated values
                     to_print = "";
-                    foreach (Cam_table c in a)
+                    foreach (CamTable c in a)
                     {
                         cur_time = c.get_timer();
                         to_print+= c.get_mac() + " " + c.get_port() + " " + cur_time + "\n";
@@ -301,8 +301,8 @@ namespace c_sharp_test_2
                         //Cam_table[] up_cams = new Cam_table[4];
                         //List<int> removed_cams = new List<int>();
                         //List<Cam_table> up_cams = new List<Cam_table>();
-                        BlockingCollection<Cam_table> b = new BlockingCollection<Cam_table>();//prerobit
-                        foreach (Cam_table c in a)
+                        BlockingCollection<CamTable> b = new BlockingCollection<CamTable>();//prerobit
+                        foreach (CamTable c in a)
                         {
                             cur_time = c.get_timer();
                             //cur_time = c.get_timer();
@@ -321,7 +321,7 @@ namespace c_sharp_test_2
                             size++;
 
                         }
-                        foreach (Cam_table t in up_cams)
+                        foreach (CamTable t in up_cams)
                         {
                             if (t != null)
                             {
@@ -330,7 +330,7 @@ namespace c_sharp_test_2
 
                         }
                         j = 0;
-                        foreach (Cam_table item in a.GetConsumingEnumerable())
+                        foreach (CamTable item in a.GetConsumingEnumerable())
                         {
                             if (size == j + 1)
                             {
@@ -364,7 +364,7 @@ namespace c_sharp_test_2
                         */
                         richTextBox1.Text = "";
                         to_print = "";
-                        foreach (Cam_table c in up_cams)
+                        foreach (CamTable c in up_cams)
                         {
 
                             to_print+= c.get_mac() + " " + c.get_port() + " " + c.get_timer() + "\n";

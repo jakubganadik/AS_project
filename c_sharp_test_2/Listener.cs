@@ -19,7 +19,7 @@ namespace c_sharp_test_2
         Packet_handler h_loop;
         private Form1 myform;
         private string mac_dest;
-        private BlockingCollection<Cam_table> tbl;
+        private BlockingCollection<CamTable> tbl;
         private BlockingCollection<Rule> lor;
         private int max_time;
         private bool has_src;
@@ -43,7 +43,7 @@ namespace c_sharp_test_2
         public void recv()
         {
 
-            BlockingCollection<Cam_table> cam_vals = new BlockingCollection<Cam_table>();
+            BlockingCollection<CamTable> cam_vals = new BlockingCollection<CamTable>();
             BlockingCollection<Captured_packet> packet_buff = new BlockingCollection<Captured_packet>();
             Packet_counter.cam_values = cam_vals;
             Table_update t_up = new Table_update(); 
@@ -277,7 +277,7 @@ namespace c_sharp_test_2
                                 //if empty
                                 if (tbl == null)
                                 {
-                                    Cam_table c = new Cam_table();
+                                    CamTable c = new CamTable();
 
                                     c.set_cam(packet.Ethernet.Source.ToString(), name, max_time, packet.Ethernet.IpV4.Source.ToString());
 
@@ -288,7 +288,7 @@ namespace c_sharp_test_2
                                 }
                                 else
                                 {
-                                    foreach (Cam_table t in tbl)//osetrit null aj tu
+                                    foreach (CamTable t in tbl)//osetrit null aj tu
                                     {
                                         if (t != null)
                                         {
@@ -311,7 +311,7 @@ namespace c_sharp_test_2
 
                                     if (has_src == false)
                                     {
-                                        Cam_table c = new Cam_table();
+                                        CamTable c = new CamTable();
 
                                         c.set_cam(packet.Ethernet.Source.ToString(), name, max_time, packet.Ethernet.IpV4.Source.ToString());
 

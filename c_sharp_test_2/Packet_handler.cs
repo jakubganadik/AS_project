@@ -10,16 +10,22 @@ namespace c_sharp_test_2
     class Packet_handler
     {
         private PacketCommunicator pack_comm;
-        private string name;
+        private string _name;
         public void get_device_send(PacketCommunicator pack_comm, string name)
         {
             this.pack_comm = pack_comm;
-            this.name = name;
+            _name = name;
         }
+
+        string Name
+        {
+            get => _name;
+        }
+
         public void run_handler(Packet packet)
         {
             // print timestamp and length of the packet
-            Console.WriteLine(packet.Timestamp.ToString("yyyy-MM-dd hh:mm:ss.fff") + " length:" + "it got here" + packet.Length + "got here" + name);
+            Console.WriteLine(packet.Timestamp.ToString("yyyy-MM-dd hh:mm:ss.fff") + " length:" + "it got here" + packet.Length + "got here" + Name);
             //testy s tymito vecami
             //ArpDatagram arp = packet.Ethernet.Arp;
             //IpV4Datagram ip = packet.Ethernet.IpV4;

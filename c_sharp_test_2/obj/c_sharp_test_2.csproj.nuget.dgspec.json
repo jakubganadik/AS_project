@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\bluep\\source\\repos\\c_sharp_test_2\\c_sharp_test_2\\c_sharp_test_2.csproj": {}
+    "C:\\Users\\ASUS\\source\\repos\\PSIP\\c_sharp_test_2\\c_sharp_test_2.csproj": {}
   },
   "projects": {
-    "C:\\Users\\bluep\\source\\repos\\c_sharp_test_2\\c_sharp_test_2\\c_sharp_test_2.csproj": {
+    "C:\\Users\\ASUS\\source\\repos\\PSIP\\c_sharp_test_2\\c_sharp_test_2.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\bluep\\source\\repos\\c_sharp_test_2\\c_sharp_test_2\\c_sharp_test_2.csproj",
+        "projectUniqueName": "C:\\Users\\ASUS\\source\\repos\\PSIP\\c_sharp_test_2\\c_sharp_test_2.csproj",
         "projectName": "c_sharp_test_2",
-        "projectPath": "C:\\Users\\bluep\\source\\repos\\c_sharp_test_2\\c_sharp_test_2\\c_sharp_test_2.csproj",
-        "packagesPath": "C:\\Users\\bluep\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\bluep\\source\\repos\\c_sharp_test_2\\c_sharp_test_2\\obj\\",
+        "projectPath": "C:\\Users\\ASUS\\source\\repos\\PSIP\\c_sharp_test_2\\c_sharp_test_2.csproj",
+        "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\ASUS\\Source\\Repos\\PSIP\\c_sharp_test_2\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\bluep\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ASUS\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -45,7 +45,8 @@
             "net47",
             "net471",
             "net472",
-            "net48"
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
           "warn": true,
@@ -57,7 +58,7 @@
               "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.103\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.100\\RuntimeIdentifierGraph.json"
         }
       }
     }

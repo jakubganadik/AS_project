@@ -9,7 +9,7 @@ namespace c_sharp_test_2
     {
         private string rules;
         private string c;
-        private BlockingCollection<Cam_table> tbl;
+        private BlockingCollection<CamTable> tbl;
         private BlockingCollection<Rule> lor;
         private bool exclude;
         private int i;

@@ -33,7 +33,7 @@ namespace c_sharp_test_2
 
             gui.set_form(myForm);
             ThreadStart childref_gui = new ThreadStart(gui.start_gui);
-            //ThreadStart childref_2 = new ThreadStart(lis_2.recv);
+            
             Thread childThread_gui = new Thread(childref_gui);
             //Thread childThread_2 = new Thread(childref_2);
             childThread_gui.Start();
@@ -58,6 +58,7 @@ namespace c_sharp_test_2
 
             camthr.Start();
             //---------------------------------------------------------------------------------------------------starting new threads
+
             PacketDevice selectedDevice_1 = allDevices[deviceIndex_1 - 1];
 
             PacketDevice selectedDevice_2 = allDevices[deviceIndex_2 - 1];
