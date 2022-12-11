@@ -77,34 +77,10 @@ namespace c_sharp_test_2
             
             Rule rul = new Rule();
             rul.set_filters(r_s[0],r_s[6], r_s[2],r_s[7], r_s[1], r_s[4], r_s[3],r_s[5]);//number needs incrementing---------------------------------------------------------------
-            lor.Add(rul);
-            Packet_counter.List_of_rules = lor;
+            Program.SetOfRules.Add(rul);
+            //lor.Add(rul);
+            //Packet_counter.List_of_rules = lor;
             form1.Invoke(form1.myDelegate_rules);
-
-            /*
-            foreach (Cam_table c_t in tbl)
-            {
-                if ((c_t.get_mac() == r_s[0] || c_t.get_ip() == r_s[2]) && exclude == false)
-                {
-                    Rule rul = new Rule();
-                    rul.set_filters(r_s[0], r_s[2], r_s[1], r_s[4], 1,r_s[3]);//get number from global arr
-                    lor.Add(rul);
-                    break;
-                }
-                else if (exclude == true)
-                {
-                    if (c_t.get_mac() != r_s[0] || c_t.get_ip() != r_s[2])
-                    {
-                        
-                        Rule rul = new Rule();
-                        rul.set_filters(r_s[0], r_s[2], r_s[1], r_s[4], 1, r_s[3]);
-                        lor.Add(rul);
-                    }
-                }
-            }
-            */
-
-
 
         }
     }

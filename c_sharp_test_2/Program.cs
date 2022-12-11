@@ -8,11 +8,11 @@ namespace c_sharp_test_2
 {
     class Program
     {
+        public static BlockingCollection<Rule> SetOfRules = new BlockingCollection<Rule>();
         static void Main(string[] args)
         {
             int deviceIndex_1, deviceIndex_2;
             IList<LivePacketDevice> allDevices = LivePacketDevice.AllLocalMachine;
-
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Form2 myForm_2 = new Form2();
@@ -40,16 +40,6 @@ namespace c_sharp_test_2
 
 
 
-            //-------------------------------------------------------------------------------------------------
-
-
-
-            //Packet_counter pc = new Packet_counter();
-            // Retrieve the device list from the local machine
-            //vypise ssa do dalsieho okna
-
-            
-            // Take the selected adapter
             Cam_table_print c = new Cam_table_print();
             c.set(myForm);
             ThreadStart childref_cam = new ThreadStart(c.run_cam_print);//nie pocas inicializacie
@@ -70,9 +60,8 @@ namespace c_sharp_test_2
             name_1 = "one";
             name_2 = "two";
             Packet_counter.val_for_timer = 10;
+
             
-            BlockingCollection<Rule> lor = new BlockingCollection<Rule>();
-            Packet_counter.List_of_rules = lor;
             PacketCommunicator communicator_lis_1 = selectedDevice_1.Open(65536, PacketDeviceOpenAttributes.Promiscuous | PacketDeviceOpenAttributes.NoCaptureLocal, 1000); // promiscuous mode
             PacketCommunicator communicator_lis_2 = selectedDevice_2.Open(65536, PacketDeviceOpenAttributes.Promiscuous | PacketDeviceOpenAttributes.NoCaptureLocal, 1000);
             // new part
@@ -88,35 +77,6 @@ namespace c_sharp_test_2
             childThread_1.Start();
             childThread_2.Start();
 
-
-
-
-            //--------------------------------------------------------------------------------------------------------
-
-
-
-            //int test = 0;
-            /*
-            Console.WriteLine("This is C#");
-            AutoResetEvent event_1 = new AutoResetEvent(true);
-            Packet_counter.thr_wait = event_1;
-            */
-            /*
-            while (true)
-            {
-                Thread.Sleep(10);
-                test++;
-                Packet_counter.load_values = test;
-                //myForm.update_values(test);
-
-                myForm.Invoke(myForm.myDelegate);
-                */
-            /*
-            event_1.Set();
-            event_1.Reset();
-            */
-
-            // update things in myOtherForm here
 
 
         }

@@ -22,22 +22,10 @@ namespace c_sharp_test_2
 
             set
             {
-                // You can add logic here for race conditions,
-                // or other measurements
+
                 statistics = value;
             }
-            /*
-            private static int test;
-            public static void set_vars(int test)
-            {
-                test = test;
-            }
-            public static int get_vars() 
-            {
-
-                return test;
-            }
-            */
+           
         }
         
         
@@ -56,22 +44,10 @@ namespace c_sharp_test_2
             }
             set
             {
-                // You can add logic here for race conditions,
-                // or other measurements
+
                 event_1 = value;
             }
-            /*
-            private static int test;
-            public static void set_vars(int test)
-            {
-                test = test;
-            }
-            public static int get_vars() 
-            {
-
-                return test;
-            }
-            */
+           
         }
 
 

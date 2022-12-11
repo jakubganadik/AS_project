@@ -44,12 +44,7 @@ namespace c_sharp_test_2
         {
             return filter;
         }
-        /*
-        public int get_num()
-        {
-            return num;
-        }
-        */
+
         public string get_ip_src()
         {
             return ip_src;

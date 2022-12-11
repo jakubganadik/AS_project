@@ -47,8 +47,7 @@ namespace c_sharp_test_2
             BlockingCollection<Captured_packet> packet_buff = new BlockingCollection<Captured_packet>();
             Packet_counter.cam_values = cam_vals;
             Table_update t_up = new Table_update(); 
-            //Packet_counter.cam_values = cam_vals;
-            //ph.get_device_send(allDevices[deviceIndex_2 - 1]);
+
             int[] num_packets = new int[14];
             myform.Invoke(myform.myDelegate_3);//--------------------------------------------new delegate
             Thread.Sleep(10);
@@ -75,17 +74,7 @@ namespace c_sharp_test_2
                 return;
             }
 
-            // Compile the filter
-            /*
-            using (BerkeleyPacketFilter filter = communicator.CreateFilter("ip and udp"))
-            {
-                // Set the filter
-                communicator.SetFilter(filter);
-            }
-            */
-            //zisti ci sa using opakuje
-
-            //nedari sa zachytit premavku, otestovat, ci je spravny adapter cez gns a wireshark
+            
             t_up.set_table(name, myform, packet_buff);
             ThreadStart send = new ThreadStart(t_up.update);
 
@@ -196,31 +185,14 @@ namespace c_sharp_test_2
 
                                         filtered = true;
                                         filtered_cam = true;
-                                        /*
-                                        if (r.get_io().Equals("OUT"))
-                                        {
-                                            filtered_cam = false;
-                                        }
-                                        
-                                        in_out = r.get_io();
-                                        */
+                                       
                                         in_out = "IN";
                                     }
 
 
 
                                 }
-                                /*
-                                else if (r.get_exec().Equals("exc"))
-                                {
-                                    if ((packet.Ethernet.Source.ToString()[1] == '0' || packet.Ethernet.Source.ToString()[1] == '4' || packet.Ethernet.Source.ToString()[1] == '8' || packet.Ethernet.Source.ToString()[1] == 'C') && p_type == "InternetControlMessageProtocol" && r.get_io() == "IN")
-                                    {
-                                        filtered_cam = true;
-                                    }
-                                    filtered = true;
-                                    in_out = r.get_io();
-                                }
-                                */
+                               
                                 else if(r.get_mac_dst().Equals("") && r.get_mac_src().Equals("") && r.get_ip_dst().Equals("") && r.get_ip_src().Equals("")) //urobit aj pre except
                                 {
                                     if (p_type.Equals(r.get_filter()) && r.get_excp() == "")
@@ -252,14 +224,7 @@ namespace c_sharp_test_2
                                     
                                     
                                 }
-                                /*
-                                else if (r.get_excp() == "exc")
-                                {
-                                    in_out = "IN";
-                                    filtered = true;
-                                    filtered_cam = true;
-                                }
-                                */
+                                
 
                             }
                         }
@@ -331,9 +296,6 @@ namespace c_sharp_test_2
                         
 
 
-                        //---------------------------------determine in out----------------------------------------------------
-                        //determine where to send
-
                         Captured_packet c_p = new Captured_packet();
 
                         if (filtered == false)
@@ -380,16 +342,6 @@ namespace c_sharp_test_2
 
 
             } while (true);
-            // start the capture
-            // communicator_lis.ReceivePackets(0, PacketHandler);//communicator_lis.ReceivePackets(0, PacketHandler)
-
-
-
-
-
-
-
-
 
         }
     }

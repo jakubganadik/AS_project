@@ -32,8 +32,7 @@ namespace c_sharp_test_2
         {
             this._max_time = ma;
             _stopwatch.Restart();
-            //this.stopwatch.Stop();
-            //this.stopwatch.Start();
+
         }
         public void set_port(string p)
         {
@@ -84,7 +83,7 @@ namespace c_sharp_test_2
                 _cur_time = _max_time - CurrentTime(0, 2, 3600)
                                     - CurrentTime(3, 2, 60)
                                     - CurrentTime(6, 2, 1);
-                if (_cur_time < 0)//warn when reaches zero
+                if (_cur_time < 0)
                 {
                     _cur_time = -1;
                 }
