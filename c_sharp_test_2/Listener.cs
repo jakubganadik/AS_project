@@ -139,7 +139,7 @@ namespace c_sharp_test_2
                         {//exclusive
                             foreach (Rule r in Rules_parser.SetOfRules)//osetrit null aj tu
                             {   //src and dst mac combination
-                                if (( (packet.Ethernet.Source.ToString().Equals(r.SourceMac) && packet.Ethernet.Destination.ToString().Equals(r.DestinationMac)) || (packet.Ethernet.Source.ToString().Equals(r.SourceMac) && r.DestinationMac.Equals("")) || (packet.Ethernet.Destination.ToString().Equals(r.DestinationMac) && r.SourceMac.Equals(""))) || ((packet.Ethernet.IpV4.Source.ToString().Equals(r.SourceIP) && packet.Ethernet.IpV4.Destination.ToString().Equals(r.DestinationeIP)) || (packet.Ethernet.IpV4.Source.ToString().Equals(r.SourceIP) && r.DestinationeIP.Equals("")) || (packet.Ethernet.IpV4.Destination.ToString().Equals(r.DestinationeIP) && r.SourceIP.Equals(""))))
+                                if (( (packet.Ethernet.Source.ToString().Equals(r.SourceMac) && packet.Ethernet.Destination.ToString().Equals(r.DestinationMac)) || (packet.Ethernet.Source.ToString().Equals(r.SourceMac) && r.DestinationMac.Equals("")) || (packet.Ethernet.Destination.ToString().Equals(r.DestinationMac) && r.SourceMac.Equals(""))) || ((packet.Ethernet.IpV4.Source.ToString().Equals(r.SourceIp) && packet.Ethernet.IpV4.Destination.ToString().Equals(r.DestinationeIp)) || (packet.Ethernet.IpV4.Source.ToString().Equals(r.SourceIp) && r.DestinationeIp.Equals("")) || (packet.Ethernet.IpV4.Destination.ToString().Equals(r.DestinationeIp) && r.SourceIp.Equals(""))))
 
 
                                 {
@@ -197,7 +197,7 @@ namespace c_sharp_test_2
 
                                 }
                                
-                                else if(r.DestinationMac.Equals("") && r.SourceMac.Equals("") && r.DestinationeIP.Equals("") && r.SourceIP.Equals("")) //urobit aj pre except
+                                else if(r.DestinationMac.Equals("") && r.SourceMac.Equals("") && r.DestinationeIp.Equals("") && r.SourceIp.Equals("")) //urobit aj pre except
                                 {
                                     if (p_type.Equals(r.Filter) && r.ExceptRule == "")
                                     {
@@ -258,7 +258,7 @@ namespace c_sharp_test_2
                                             if (t.get_mac() == packet.Ethernet.Source.ToString())
                                             {
                                                 t.set_timer(max_time);//timer
-                                                t.set_port(name);
+                                                t.Port=name;
                                                 has_src = true;
                                             }
                                             if (t.get_mac() == packet.Ethernet.Destination.ToString())

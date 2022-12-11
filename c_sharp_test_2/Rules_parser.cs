@@ -25,8 +25,8 @@ namespace c_sharp_test_2
             Rule rul = new Rule();
             rul.DestinationMac = "";
             rul.SourceMac = "";
-            rul.DestinationeIP = "";
-            rul.SourceIP = "";
+            rul.DestinationeIp = "";
+            rul.SourceIp = "";
             rul.Port = "";
             rul.ExceptRule = "";
             rul.Filter = "";
@@ -45,11 +45,11 @@ namespace c_sharp_test_2
                 }
                 else if (string_arr[i] == "ip_dst")
                 {
-                    rul.DestinationeIP = string_arr[j];
+                    rul.DestinationeIp = string_arr[j];
                 }
                 else if (string_arr[i] == "ip_src") //source a dest ip solve
                 {
-                    rul.SourceIP = string_arr[j];
+                    rul.SourceIp = string_arr[j];
 
                 }
                 else if (string_arr[i] == "port")

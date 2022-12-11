@@ -140,7 +140,7 @@ namespace c_sharp_test_2
             i = 0;
             foreach (Rule r in Rules_parser.SetOfRules)
             {
-                rule_str += "| "+i.ToString() + " src_mac " + r.SourceMac + " dst_mac " + r.DestinationMac + " ip_src " + r.SourceIP + " ip_dst " + r.DestinationeIP + " filter " + r.Filter + " io " + r.InOutRule + " " + r.ExceptRule + "|"+"\n";
+                rule_str += "| "+i.ToString() + " src_mac " + r.SourceMac + " dst_mac " + r.DestinationMac + " ip_src " + r.SourceIp + " ip_dst " + r.DestinationeIp + " filter " + r.Filter + " io " + r.InOutRule + " " + r.ExceptRule + "|"+"\n";
                 i++;
             }
             richTextBox2.Text = rule_str;
@@ -378,7 +378,7 @@ namespace c_sharp_test_2
                 i = 0;
                 foreach (Rule r in rem)
                 {
-                    rule_str +=  "|"+i.ToString() + " src_mac " + r.SourceMac + " dst_mac " + r.DestinationMac + " ip_src " + r.SourceIP + " ip_dst " + r.DestinationeIP + " filter " + r.Filter + " io " + r.InOutRule + " "+ r.ExceptRule+"|"+"\n";
+                    rule_str +=  "|"+i.ToString() + " src_mac " + r.SourceMac + " dst_mac " + r.DestinationMac + " ip_src " + r.SourceIp + " ip_dst " + r.DestinationeIp + " filter " + r.Filter + " io " + r.InOutRule + " "+ r.ExceptRule+"|"+"\n";
                     i++;
                     b_r.Add(r);
                 }
