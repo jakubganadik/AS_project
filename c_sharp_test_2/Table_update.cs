@@ -196,11 +196,11 @@ namespace c_sharp_test_2
                 
                 if (name == "one")
                 {
-                    num_packets = Packet_counter.load_values;
+                    num_packets = Listener.NumberPacketsPort1;
                 }
                 else if (name == "two")
                 {
-                    num_packets = Packet_counter.load_values_2;
+                    num_packets = Listener.NumberPacketsPort2;
                 }
                 
                 UpdateCamTable();
@@ -209,13 +209,13 @@ namespace c_sharp_test_2
                 //new threads here
                 if (name == "one")
                 {
-                    Packet_counter.load_values = num_packets;//test
+                    Listener.NumberPacketsPort1 = num_packets;
                     myform.Invoke(myform.myDelegate);
 
                 }
                 else if (name == "two")
                 {
-                    Packet_counter.load_values_2 = num_packets;
+                    Listener.NumberPacketsPort2 = num_packets;
                     myform.Invoke(myform.myDelegate_2);
 
                 }

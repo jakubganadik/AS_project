@@ -30,6 +30,12 @@ namespace c_sharp_test_2
         private bool filtered;
         private string in_out;
         private bool filtered_cam;
+        public static BlockingCollection<CamTable> CamValues = new BlockingCollection<CamTable>();
+        public static int[] NumberPacketsPort1 = new int[1000];
+        public static int[] NumberPacketsPort2 = new int[1000];
+        
+        public static int TimerValue { get; set; }
+ 
         public void list_get(PacketCommunicator pack_comm, string name, Packet_handler h, Form1 myform,string n_l,Packet_handler h_l)
         {
 
@@ -39,13 +45,12 @@ namespace c_sharp_test_2
             this.myform = myform;
             this.name_loop = n_l;
             this.h_loop = h_l;
+            TimerValue = 10;
         }
         public void recv()
         {
-
-            BlockingCollection<CamTable> cam_vals = new BlockingCollection<CamTable>();
+            
             BlockingCollection<Captured_packet> packet_buff = new BlockingCollection<Captured_packet>();
-            Packet_counter.cam_values = cam_vals;
             Table_update t_up = new Table_update(); 
 
             int[] num_packets = new int[14];
@@ -58,12 +63,12 @@ namespace c_sharp_test_2
             }
             if (name == "one")
             {
-                Packet_counter.load_values = num_packets;//tuto test
+                NumberPacketsPort1 = num_packets;//tuto test
                 myform.Invoke(myform.myDelegate);
             }
             else if (name == "two")
             {
-                Packet_counter.load_values_2 = num_packets;//tuto test
+                NumberPacketsPort2 = num_packets;//tuto test
                 myform.Invoke(myform.myDelegate_2);
             }
 
@@ -127,33 +132,32 @@ namespace c_sharp_test_2
                             }
                         }
                         in_out = "";
-                        lor = Packet_counter.List_of_rules;
                         filtered = false;//careful with all keyword
                         filtered_cam = false;
                         
-                        if (lor != null)
+                        if (Rules_parser.SetOfRules != null)
                         {//exclusive
-                            foreach (Rule r in lor)//osetrit null aj tu
+                            foreach (Rule r in Rules_parser.SetOfRules)//osetrit null aj tu
                             {   //src and dst mac combination
-                                if (( (packet.Ethernet.Source.ToString().Equals(r.get_mac_src()) && packet.Ethernet.Destination.ToString().Equals(r.get_mac_dst())) || (packet.Ethernet.Source.ToString().Equals(r.get_mac_src()) && r.get_mac_dst().Equals("")) || (packet.Ethernet.Destination.ToString().Equals(r.get_mac_dst()) && r.get_mac_src().Equals(""))) || ((packet.Ethernet.IpV4.Source.ToString().Equals(r.get_ip_src()) && packet.Ethernet.IpV4.Destination.ToString().Equals(r.get_ip_dst())) || (packet.Ethernet.IpV4.Source.ToString().Equals(r.get_ip_src()) && r.get_ip_dst().Equals("")) || (packet.Ethernet.IpV4.Destination.ToString().Equals(r.get_ip_dst()) && r.get_ip_src().Equals(""))))//last rule goes packet.Ethernet.Source.ToString().Equals(r.get_mac()) || packet.Ethernet.IpV4.Source.ToString().Equals(r.get_ip())
+                                if (( (packet.Ethernet.Source.ToString().Equals(r.SourceMac) && packet.Ethernet.Destination.ToString().Equals(r.DestinationMac)) || (packet.Ethernet.Source.ToString().Equals(r.SourceMac) && r.DestinationMac.Equals("")) || (packet.Ethernet.Destination.ToString().Equals(r.DestinationMac) && r.SourceMac.Equals(""))) || ((packet.Ethernet.IpV4.Source.ToString().Equals(r.SourceIP) && packet.Ethernet.IpV4.Destination.ToString().Equals(r.DestinationeIP)) || (packet.Ethernet.IpV4.Source.ToString().Equals(r.SourceIP) && r.DestinationeIP.Equals("")) || (packet.Ethernet.IpV4.Destination.ToString().Equals(r.DestinationeIP) && r.SourceIP.Equals(""))))
 
 
                                 {
-                                    if (p_type.Equals(r.get_filter()) && r.get_excp().Equals("")) // if nothing, then filter everything
+                                    if (p_type.Equals(r.Filter) && r.ExceptRule.Equals("")) // if nothing, then filter everything
                                     {
-                                        if ((packet.Ethernet.Source.ToString()[1] == '0' || packet.Ethernet.Source.ToString()[1] == '4' || packet.Ethernet.Source.ToString()[1] == '8' || packet.Ethernet.Source.ToString()[1] == 'C') && (p_type == "InternetControlMessageProtocol" || p_type == "Arp") && r.get_io() == "IN")
+                                        if ((packet.Ethernet.Source.ToString()[1] == '0' || packet.Ethernet.Source.ToString()[1] == '4' || packet.Ethernet.Source.ToString()[1] == '8' || packet.Ethernet.Source.ToString()[1] == 'C') && (p_type == "InternetControlMessageProtocol" || p_type == "Arp") && r.InOutRule == "IN")
                                         {
                                             filtered_cam = true;
                                         }
-                                        else if ((packet.Ethernet.Source.ToString()[1] == '0' || packet.Ethernet.Source.ToString()[1] == '4' || packet.Ethernet.Source.ToString()[1] == '8' || packet.Ethernet.Source.ToString()[1] == 'C') && (p_type == "InternetControlMessageProtocol" || p_type == "Arp") && r.get_io() == "OUT")
+                                        else if ((packet.Ethernet.Source.ToString()[1] == '0' || packet.Ethernet.Source.ToString()[1] == '4' || packet.Ethernet.Source.ToString()[1] == '8' || packet.Ethernet.Source.ToString()[1] == 'C') && (p_type == "InternetControlMessageProtocol" || p_type == "Arp") && r.InOutRule == "OUT")
                                         {
                                             filtered_cam = false;
                                         }
 
                                         filtered = true;
-                                        in_out = r.get_io();
+                                        in_out = r.InOutRule;
                                         
-                                        if (p_type == "Udp" && packet.Ethernet.IpV4.Udp.SourcePort.ToString() != r.get_port()) // test for port
+                                        if (p_type == "Udp" && packet.Ethernet.IpV4.Udp.SourcePort.ToString() != r.Port) // test for port
                                         {
                                             filtered = false;
                                             in_out = "";
@@ -162,25 +166,25 @@ namespace c_sharp_test_2
 
 
                                     }
-                                    else if (p_type.Equals(r.get_filter()) && r.get_excp().Equals("exc"))
+                                    else if (p_type.Equals(r.Filter) && r.ExceptRule.Equals("exc"))
                                     {
-                                        if (r.get_io() == "")
+                                        if (r.InOutRule == "")
                                         {
                                             filtered = false;
-                                            in_out = r.get_io();
+                                            in_out = r.InOutRule;
                                             filtered_cam = false;
                                         }
                                         else
                                         {
                                             filtered = true;
-                                            in_out = r.get_io();
+                                            in_out = r.InOutRule;
                                             filtered_cam = true;
                                         }
                                         
                                     }
 
                                     //if ((packet.Ethernet.IpV4.Source.ToString().Equals(r.get_ip_src()) && packet.Ethernet.IpV4.Destination.ToString().Equals(r.get_ip_dst())) || (packet.Ethernet.IpV4.Source.ToString().Equals(r.get_ip_src()) && r.get_ip_dst().Equals("")) || (packet.Ethernet.IpV4.Destination.ToString().Equals(r.get_ip_dst()) && r.get_ip_src().Equals("")))
-                                    else if (p_type != r.get_filter() && r.get_excp().Equals("exc"))
+                                    else if (p_type != r.Filter && r.ExceptRule.Equals("exc"))
                                     {
 
                                         filtered = true;
@@ -193,31 +197,31 @@ namespace c_sharp_test_2
 
                                 }
                                
-                                else if(r.get_mac_dst().Equals("") && r.get_mac_src().Equals("") && r.get_ip_dst().Equals("") && r.get_ip_src().Equals("")) //urobit aj pre except
+                                else if(r.DestinationMac.Equals("") && r.SourceMac.Equals("") && r.DestinationeIP.Equals("") && r.SourceIP.Equals("")) //urobit aj pre except
                                 {
-                                    if (p_type.Equals(r.get_filter()) && r.get_excp() == "")
+                                    if (p_type.Equals(r.Filter) && r.ExceptRule == "")
                                     {
                                         filtered = true;
-                                        in_out = r.get_io();
-                                        if (p_type == "Udp" && packet.Ethernet.IpV4.Udp.SourcePort.ToString() != r.get_port()) // test for port
+                                        in_out = r.InOutRule;
+                                        if (p_type == "Udp" && packet.Ethernet.IpV4.Udp.SourcePort.ToString() != r.Port) // test for port
                                         {
                                             filtered = false;
                                             in_out = "";
                                         }
                                     }
-                                    else if (p_type.Equals(r.get_filter()) && r.get_excp() == "exc")
+                                    else if (p_type.Equals(r.Filter) && r.ExceptRule == "exc")
                                     {
                                         filtered = false;
                                         in_out = "";
-                                        if (p_type == "Udp" && packet.Ethernet.IpV4.Udp.SourcePort.ToString() != r.get_port()) // test for port
+                                        if (p_type == "Udp" && packet.Ethernet.IpV4.Udp.SourcePort.ToString() != r.Port) // test for port
                                         {
                                             filtered = true;
-                                            in_out = r.get_io();
+                                            in_out = r.InOutRule;
                                         }
                                     }
-                                    else if (p_type != r.get_filter() && r.get_excp() == "exc"){
+                                    else if (p_type != r.Filter && r.ExceptRule == "exc"){
                                         filtered = true;
-                                        in_out = r.get_io();//in_out = r.get_io()
+                                        in_out = r.InOutRule;
 
                                     }
                                     
@@ -237,23 +241,17 @@ namespace c_sharp_test_2
 
                                 not_a_pc = false;
                                 has_src = false;
-                                max_time = Packet_counter.val_for_timer;
-                                tbl = Packet_counter.cam_values;
-                                //if empty
-                                if (tbl == null)
+                                max_time = TimerValue;
+                                if (CamValues == null)
                                 {
                                     CamTable c = new CamTable();
-
                                     c.set_cam(packet.Ethernet.Source.ToString(), name, max_time, packet.Ethernet.IpV4.Source.ToString());
-
-
-                                    tbl.Add(c);
-                                    Packet_counter.cam_values = tbl;//zaznam v cam tab
+                                    CamValues.Add(c);
 
                                 }
                                 else
                                 {
-                                    foreach (CamTable t in tbl)//osetrit null aj tu
+                                    foreach (CamTable t in CamValues)//osetrit null aj tu
                                     {
                                         if (t != null)
                                         {
@@ -279,10 +277,7 @@ namespace c_sharp_test_2
                                         CamTable c = new CamTable();
 
                                         c.set_cam(packet.Ethernet.Source.ToString(), name, max_time, packet.Ethernet.IpV4.Source.ToString());
-
-
-                                        tbl.Add(c);
-                                        Packet_counter.cam_values = tbl;//zaznam v cam tab
+                                        CamValues.Add(c);
 
                                     }
                                 }

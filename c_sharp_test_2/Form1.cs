@@ -89,8 +89,8 @@ namespace c_sharp_test_2
 
 
 
-            int[] num_pck1 = Packet_counter.load_values;
-            int[] num_pck2 = Packet_counter.load_values_2;
+            int[] num_pck1 = Listener.NumberPacketsPort1;
+            int[] num_pck2 = Listener.NumberPacketsPort2;
             for (int i = 0; i < 14; i++)//tu povodne bolo len pre jeden delegate
             {
                 num_pck1[i] = 0;
@@ -105,7 +105,7 @@ namespace c_sharp_test_2
         {
             j = 0;
             size = 0;
-            BlockingCollection<CamTable> a = Packet_counter.cam_values;
+            BlockingCollection<CamTable> a =Listener.CamValues;
             
             //int[] removed_cams = new int[4];
             //Cam_table[] up_cams = new Cam_table[4];
@@ -127,7 +127,7 @@ namespace c_sharp_test_2
                 j++;
             }
             a = b;
-            Packet_counter.cam_values = a;
+            Listener.CamValues = a;
             
             richTextBox1.Text = " ";
 
@@ -136,12 +136,11 @@ namespace c_sharp_test_2
         }
         private void update_rules()
         {
-            lor = Packet_counter.List_of_rules;
             rule_str = "";
             i = 0;
-            foreach (Rule r in lor)
+            foreach (Rule r in Rules_parser.SetOfRules)
             {
-                rule_str += "| "+i.ToString() + " src_mac " + r.get_mac_src() + " dst_mac " + r.get_mac_dst() + " ip_src " + r.get_ip_src() + " ip_dst " + r.get_ip_dst() + " filter " + r.get_filter() + " io " + r.get_io() + " " + r.get_excp() + "|"+"\n";
+                rule_str += "| "+i.ToString() + " src_mac " + r.SourceMac + " dst_mac " + r.DestinationMac + " ip_src " + r.SourceIP + " ip_dst " + r.DestinationeIP + " filter " + r.Filter + " io " + r.InOutRule + " " + r.ExceptRule + "|"+"\n";
                 i++;
             }
             richTextBox2.Text = rule_str;
@@ -152,8 +151,7 @@ namespace c_sharp_test_2
 
             i = 0;
             help_print = 0;
-            BlockingCollection<CamTable> a = Packet_counter.cam_values;//wont work if its empty
-                                                                        //a.CopyTo();
+            BlockingCollection<CamTable> a = Listener.CamValues;
 
             List<int> removed_cams = new List<int>();
             List<CamTable> up_cams = new List<CamTable>();
@@ -234,7 +232,7 @@ namespace c_sharp_test_2
                             j++;
                         }
                         a = b;
-                        Packet_counter.cam_values = a;
+                        Listener.CamValues = a;
                        
                         richTextBox1.Text = "";
                         to_print = "";
@@ -259,7 +257,7 @@ namespace c_sharp_test_2
         
         public void update_values_2()
         {//prerobit
-            int[] stats = Packet_counter.load_values_2;
+            int[] stats = Listener.NumberPacketsPort2;
             int i = 0;//set this textbox
             foreach (TextBox tb in groupBox2.Controls.OfType<TextBox>())
             {
@@ -282,7 +280,7 @@ namespace c_sharp_test_2
         }
         public void update_values()
         {//prerobit
-            int[] stats = Packet_counter.load_values;
+            int[] stats = Listener.NumberPacketsPort1;
             int i = 0;
             foreach (TextBox tb in groupBox1.Controls.OfType<TextBox>())
             {
@@ -335,7 +333,7 @@ namespace c_sharp_test_2
         {
             
             max_time = Int32.Parse(textBox29.Text);
-            Packet_counter.val_for_timer = max_time;
+            Listener.TimerValue = max_time;
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -362,11 +360,11 @@ namespace c_sharp_test_2
             try
             {
                 rule_remove = Int32.Parse(textBox31.Text);
-                lor = Packet_counter.List_of_rules;
+
                 List<Rule> rem = new List<Rule>();
                 BlockingCollection<Rule> b_r = new BlockingCollection<Rule>();
                 i = 0;
-                foreach (Rule r in lor)
+                foreach (Rule r in Rules_parser.SetOfRules)
                 {
                     if (i != rule_remove)
                     {
@@ -380,12 +378,12 @@ namespace c_sharp_test_2
                 i = 0;
                 foreach (Rule r in rem)
                 {
-                    rule_str +=  "|"+i.ToString() + " src_mac " + r.get_mac_src() + " dst_mac " + r.get_mac_dst() + " ip_src " + r.get_ip_src() + " ip_dst " + r.get_ip_dst() + " filter " + r.get_filter() + " io " + r.get_io() + " "+ r.get_excp()+"|"+"\n";
+                    rule_str +=  "|"+i.ToString() + " src_mac " + r.SourceMac + " dst_mac " + r.DestinationMac + " ip_src " + r.SourceIP + " ip_dst " + r.DestinationeIP + " filter " + r.Filter + " io " + r.InOutRule + " "+ r.ExceptRule+"|"+"\n";
                     i++;
                     b_r.Add(r);
                 }
                 richTextBox2.Text = rule_str;
-                Packet_counter.List_of_rules = b_r;
+                Rules_parser.SetOfRules = b_r;
 
 
                 }
