@@ -7,7 +7,7 @@ using PcapDotNet.Packets.Arp;
 using PcapDotNet.Packets.Transport;
 namespace c_sharp_test_2
 {
-    class Packet_handler
+    public class Packet_handler
     {
         private PacketCommunicator pack_comm;
         private string _name;

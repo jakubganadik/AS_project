@@ -4,7 +4,7 @@ using System.Text;
 using PcapDotNet.Packets;
 namespace c_sharp_test_2
 {
-    class Captured_packet
+    public class Captured_packet
     {
         private Packet packet;
         private Boolean port_out;

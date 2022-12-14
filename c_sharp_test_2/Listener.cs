@@ -10,7 +10,7 @@ using System.Threading;
 using System.Collections.Concurrent;
 namespace c_sharp_test_2
 {
-    class Listener
+    public class Listener: IObserverable
     {
         private PacketCommunicator pack_comm;
         private string name;
@@ -33,9 +33,15 @@ namespace c_sharp_test_2
         public static BlockingCollection<CamTable> CamValues = new BlockingCollection<CamTable>();
         public static int[] NumberPacketsPort1 = new int[1000];
         public static int[] NumberPacketsPort2 = new int[1000];
-        
+        private Table_update _observer = new Table_update();
+
         public static int TimerValue { get; set; }
- 
+
+        public void Notify()
+        {
+            _observer.Update(this);
+        }
+
         public void list_get(PacketCommunicator pack_comm, string name, Packet_handler h, Form1 myform,string n_l,Packet_handler h_l)
         {
 
@@ -47,11 +53,13 @@ namespace c_sharp_test_2
             this.h_loop = h_l;
             TimerValue = 10;
         }
+        
+        
         public void recv()
         {
             
             BlockingCollection<Captured_packet> packet_buff = new BlockingCollection<Captured_packet>();
-            Table_update t_up = new Table_update(); 
+            
 
             int[] num_packets = new int[14];
             myform.Invoke(myform.myDelegate_3);//--------------------------------------------new delegate
@@ -80,11 +88,12 @@ namespace c_sharp_test_2
             }
 
             
-            t_up.set_table(name, myform, packet_buff);
-            ThreadStart send = new ThreadStart(t_up.update);
-
-            Thread childThread_3 = new Thread(send);
-            childThread_3.Start();
+            
+            //ThreadStart send = new ThreadStart(t_up.update);
+            
+            _observer.set_table(name, myform, packet_buff);
+            //Thread childThread_3 = new Thread(send);
+            //childThread_3.Start();
 
             Packet packet;
             do
@@ -318,7 +327,8 @@ namespace c_sharp_test_2
                         }
                         
                         c_p.set_packet(packet, in_out, p_type);
-                        packet_buff.Add(c_p);//print vals
+                        packet_buff.Add(c_p);
+                        this.Notify();
 
 
 

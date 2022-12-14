@@ -6,7 +6,7 @@ using System.Collections.Concurrent;
 namespace c_sharp_test_2
 {
     //exc a IN nefunguju
-    class Table_update//run thread to update
+    public class Table_update:IPacketRecvObserver
     {
         private string name;
         private string port_out;
@@ -119,16 +119,12 @@ namespace c_sharp_test_2
                     }
                     else if (p_type == "Udp")
                     {
-                        if (port_out == "IN")
-                        {
 
-                        }
-
-                        else if (port_out == "OUT")
+                        if (port_out == "OUT")
                         {
                             num_packets[1]++;
                         }
-                        else
+                        else if (port_out != "IN")
                         {
                             num_packets[1]++;
                             num_packets[8]++;
@@ -183,12 +179,9 @@ namespace c_sharp_test_2
             }
         }
 
-        public void update()// new delegate
+        public void Update(Listener listener)// new delegate
         {
-            
-            
-            while (true)
-            {
+
                 c_p = packet_buf.Take();
                 packet = c_p.get_packet();
                 port_out = c_p.get_io();
@@ -220,7 +213,7 @@ namespace c_sharp_test_2
 
                 }
 
-            }
+            
             
         }
     }
